@@ -89,31 +89,9 @@ plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
                                     %to be ploted at the 3D figure            
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
+    
+%% 
 
-%% Plot Patch 2D
-% This will be used later for showing the planes of the electrical field 
-% as well af the process of estimation of the phases of the system. 
-x = [-1 1 1 -1];
-y = [-1 -1 1 1];
-patch(x,y,'blue')
-x1 = [-0.5 0.5 0.5 -0.5];
-y1 = [-0.5 -0.5 0.5 0.5];
-patch(x1,y1,'black')
-
-
-%% Show a coordinate 3D system. 
-quiver3(zeros(3,1),zeros(3,1),zeros(3,1),[1;0;0],[0;1;0],[0;0;1]); 
-% axis('off') % could be of help for representation.
-
-
-%% parcour Robot 
-    %create 3D model 
-    %create the 3 different options PNFR CNFR SNFR
-    %set referencial points and size of the planes distance betweens plaens
-    % [z1, z2, ..., zn] 
-    % distance between points = []
-    % output: nice 3D with points and robot
-    % and file
     
 
 

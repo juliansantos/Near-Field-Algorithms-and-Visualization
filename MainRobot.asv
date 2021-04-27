@@ -1,0 +1,15 @@
+%% parcour Robot 
+    %create 3D model 
+    %create the 3 different options PNFR CNFR SNFR
+    %set referencial points and size of the planes distance betweens plaens
+    % [z1, z2, ..., zn] 
+    % distance between points = []
+    % output: nice 3D with points and robot
+    % and file
+    
+    
+    
+    % Proposals before the measurement
+    
+    
+    %   1. Once printed the schemas of the circle, and for the 
