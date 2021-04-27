@@ -3,7 +3,7 @@
 %               1. No input -> Only the 3D structure + coordinate system
 %               2. Beta = 1 -> The 3D structure + 2 layers 
 
-function plotstructure3D(z, sl, color)
+function plotstructure3D(z, size_layers)
     vert = [-5.1 -6.565 41.2;5.1 -6.565 41.2;5.1 6.565 41.2;-5.1 6.565 41.2];
     patch('Vertices',vert,'Faces',[1 2 3 4],'FaceVertexCData',hsv(2),'FaceColor',[1 0.84 0])
 
@@ -30,20 +30,24 @@ function plotstructure3D(z, sl, color)
     hold on; alpha(.5);
     % Plot coordinate system
     quiver3(zeros(3,1),zeros(3,1),zeros(3,1),[10;0;0],[0;10;0],[0;0;10],'color','black'); 
-    xlabel('x [mm]')
-    ylabel('y [mm]')
-    zlabel('z [mm]')             
+                
     switch nargin
             case 0 
-            case 3
-                L11 =sl(1,1); L12=sl(1,2); L21=sl(2,1); L22=sl(2,2); 
-                vert = [-L11/2 -L12/2 z(1);L11/2 -L12/2 z(1);L11/2 L12/2 z(1);-L11/2 L12/2 z(1)];
-                patch('Vertices',vert,'Faces',[1 2 3 4],'FaceVertexCData',hsv(2),'FaceColor',color)
+            case 1
+                beta = 1;
+                L=50; %length of the layer of measurement in milimeters
+                if beta == 1 
+                    vert = [-L/2 -L/2 z(1);L/2 -L/2 z(1);L/2 L/2 z(1);-L/2 L/2 z(1)];
+                    patch('Vertices',vert,'Faces',[1 2 3 4],'FaceVertexCData',hsv(2),'FaceColor',[1 0 0])
 
-                vert = [-L21/2 -L22/2 z(2);L21/2 -L22/2 z(2);L21/2 L22/2 z(2);-L21/2 L22/2 z(2)];
-                patch('Vertices',vert,'Faces',[1 2 3 4],'FaceVertexCData',hsv(2),'FaceColor',color)
-                alpha(.5)
-                view(21,14) % default view, [az, el]
+                    vert = [-L/2 -L/2 z(2);L/2 -L/2 z(2);L/2 L/2 z(2);-L/2 L/2 z(2)];
+                    patch('Vertices',vert,'Faces',[1 2 3 4],'FaceVertexCData',hsv(2),'FaceColor',[1 0 0])
+                    alpha(.5)
+                    view(21,14) % default view, [az, el]
+                    xlabel('x [mm]')
+                    ylabel('y [mm]')
+                    zlabel('z [mm]')
+                end
             otherwise
                 % :v
      end
