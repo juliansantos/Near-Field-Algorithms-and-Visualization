@@ -9,19 +9,19 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/EField_z1mm_xy_1mm.txt'); 
+Edata = load('Data/EField60GHz_Horn.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
     %                           EyRe [V/m], EyIm [V/m], 
     %                           EzRe [V/m], EzIm [V/m].
         
-Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
+Hdata = load('Data/HField60GHz_Horn.txt'); 
     % Magnetic Field Columns:   x[mm], y[mm], z[mm],
     %                           HxRe [A/m], HxIm [A/m], 
     %                           HyRe [A/m], HyIm [A/m], 
     %                           HzRe [A/m], HzIm [A/m].
     
-Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
+Pdata= load('Data/PowerFlow60GHz_Horn.txt'); 
     % Power Flow Columns: x [mm], y [mm], z [mm], 
     %                     Px [V.A/m^2], 
     %                     Py [V.A/m^2], 
@@ -33,7 +33,7 @@ FFdata = load('Data/FarField60GHz_Horn.txt');
     %                    Phase(Theta) [deg.], Abs(Phi)[ dBi], 
     %                    Phase(Phi) [deg.], Ax.Ratio [dB].    
     
-%SCdata = load('Data/SurfaceCurrent60GHz_Horn.txt'); 
+SCdata = load('Data/SurfaceCurrent60GHz_Horn.txt'); 
     % Surface Current Columns: x [mm], y [mm], z [mm], 
     %                          KxRe [A/m], KxIm [A/m], 
     %                          KyRe [A/m], KyIm [A/m], 
@@ -45,7 +45,6 @@ FFdata = load('Data/FarField60GHz_Horn.txt');
 
 %% Extraction of parameters
 %Simulations
-clc;
 X=Edata(:,1);
 Y=Edata(:,2);
 Z=Edata(:,3);
@@ -79,34 +78,22 @@ clear Edata Hdata Pdata SCdata;
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
 
 %% Visualization of E field.
-    clc;
-    layers = [15,30]; % Distance in milimeters in z direction from the aperture at   
+    layers = [1,15]; % Distance in milimeters in z direction from the aperture at   
                     % which thelayers and fields want to be visualized. 
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
                                     %to be ploted at the 3D figure            
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);    
 %% Visualization of H field.
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
+    layers = [1,15]; % Distance in milimeters in z direction from the aperture at   
                     % which thelayers and fields want to be visualized. 
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
                                     %to be ploted at the 3D figure            
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
     
-%% Visualization of Power flow 
-    
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                    % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
-    plotPowerFlow(X, Y, Z, Px, Py, Pz, layers, size_layers); 
 %% PTP algorithm 
 
 % obtain layers
-% clear variables not interested in to save memory
-
-
+% clear variables not interested in 
 
     
 
