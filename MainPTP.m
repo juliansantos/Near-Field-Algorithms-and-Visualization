@@ -9,19 +9,19 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/EField_z1mm_xy_1mm.txt'); 
+Edata = load('Data/EField_z1mm_xy_0.5mm.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
     %                           EyRe [V/m], EyIm [V/m], 
     %                           EzRe [V/m], EzIm [V/m].
         
-Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
+Hdata = load('Data/HField_z1mm_xy_0.5mm.txt'); 
     % Magnetic Field Columns:   x[mm], y[mm], z[mm],
     %                           HxRe [A/m], HxIm [A/m], 
     %                           HyRe [A/m], HyIm [A/m], 
     %                           HzRe [A/m], HzIm [A/m].
     
-Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
+Pdata= load('Data/PowerFlow_z1mm_xy_0.5mm.txt'); 
     % Power Flow Columns: x [mm], y [mm], z [mm], 
     %                     Px [V.A/m^2], 
     %                     Py [V.A/m^2], 
@@ -78,34 +78,27 @@ clear Edata Hdata Pdata SCdata;
            % Explain the argumets use
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
 
-%% Visualization of E field.
+    
+%% Input parameters visualization
     clc;
     layers = [15,30]; % Distance in milimeters in z direction from the aperture at   
                     % which thelayers and fields want to be visualized. 
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
+                                    %to be ploted at the 3D figure
+
+%% Visualization of E field.            
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);    
-%% Visualization of H field.
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                    % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
+%% Visualization of H field.           
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
-    
-%% Visualization of Power flow 
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                       % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
+%% Visualization of Power flow            
     plotPowerFlow(X, Y, Z, Px, Py, Pz, layers, size_layers); 
     
+    % Example of power calculated directed from E and H:
+        %[Pcx,Pcy,Pcz]=calculatePower(Ex, Ey, Ez, Hx, Hy, Hz);
+        %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
+        
 %% Vilualization of Impedance
-    clc;
-    layers = [49,100]; % Distance in milimeters in z direction from the aperture at   
-                       % which the impedance want to be visualized.
-    impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)
+    impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
 %% PTP algorithm 
 
 % Obtain layers
