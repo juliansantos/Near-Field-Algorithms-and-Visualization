@@ -29,11 +29,11 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
         case 8
             plotstructure3D(z, size_layers, [1 0 0])
             subplot(2,4,4)
-            xtemp = X(find(Z==z(1)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(1)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(1)));
+            xtemp = X(Z==z(1));
+            x_mesh = reshape(xtemp, [length(unique(X)), length(unique(Y))]);
+            ytemp = Y(Z==z(1));
+            y_mesh = reshape(ytemp, [length(unique(Y)), length(unique(Y))]);
+            e_temp = Ex(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,((angle(e_mesh))))
             shading interp; 
@@ -43,11 +43,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Phase of Ex at ' num2str(z(1)-zref) 'mm distance from the aperture']) 
 
             subplot(2,4,3)
-            xtemp = X(find(Z==z(1)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(1)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(1)));
+            e_temp = Ex(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -57,11 +53,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Ex at ' num2str(z(1)-zref) 'mm distance from the aperture']) 
 
             subplot(2,4,8)
-            xtemp = X(find(Z==z(2)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(2)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(2)));
+            e_temp = Ex(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,((angle(e_mesh))))
             shading interp; 
@@ -71,11 +63,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Phase of Ex at ' num2str(z(2)-zref) 'mm distance from the aperture']) 
 
             subplot(2,4,7)
-            xtemp = X(find(Z==z(2)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(2)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(2)));
+            e_temp = Ex(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 

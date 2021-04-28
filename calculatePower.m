@@ -1,10 +1,15 @@
 
-clc;
+function [Px,Py,Pz]=calculatePower(Ex, Ey, Ez, Hx, Hy, Hz)
 
 S = cross([Ex, Ey, Ez],conj([Hx, Hy, Hz])); % Poynting Vector
-W  = 0.5*abs([Ex, Ey, Ez])+0.5*abs([Hx, Hy, Hz]);
+TAS = real(S);% Time average poynting vector
+Px = TAS(:,1);
+Py = TAS(:,2);
+Pz = TAS(:,3);
+
+end 
+%chismo = abs(TaS(:,1)-Px)./abs(Px+0.000000001);
+%plot(chismo); 
+%legend('calculated', 'sim')
 
 
-dif = [real(S)./Px];
-
-plot(dif(:,1))

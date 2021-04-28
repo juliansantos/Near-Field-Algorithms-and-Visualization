@@ -31,11 +31,11 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
            
 
             subplot(2,5,3)
-            xtemp = X(find(Z==z(1)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(1)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(1)));
+            xtemp = X(Z==z(1));
+            x_mesh = reshape(xtemp, [length(unique(X)), length(unique(Y))]);
+            ytemp = Y(Z==z(1));
+            y_mesh = reshape(ytemp, [length(unique(Y)), length(unique(X))]);
+            e_temp = Ex(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -45,11 +45,7 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Px at ' num2str(z(1)-zref) 'mm from the AUT']) 
 
             subplot(2,5,4)
-            xtemp = X(find(Z==z(1)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(1)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ey(find(Z==z(1)));
+            e_temp = Ey(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -59,11 +55,7 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Py at ' num2str(z(1)-zref) 'mm from the AUT']) 
 
             subplot(2,5,5)
-            xtemp = X(find(Z==z(1)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(1)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ez(find(Z==z(1)));
+            e_temp = Ez(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -73,11 +65,7 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Pz at ' num2str(z(1)-zref) 'mm from the AUT']) 
             
             subplot(2,5,8)
-            xtemp = X(find(Z==z(2)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(2)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ex(find(Z==z(2)));
+            e_temp = Ex(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -87,11 +75,7 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Px at ' num2str(z(2)-zref) 'mm from the AUT'])
             
             subplot(2,5,9)
-            xtemp = X(find(Z==z(2)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(2)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ey(find(Z==z(2)));
+            e_temp = Ey(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
@@ -101,11 +85,7 @@ function plotPowerFlow(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             title(['Magnitude of Py at ' num2str(z(2)-zref) 'mm from the AUT'])
             
             subplot(2,5,10)
-            xtemp = X(find(Z==z(2)));
-            x_mesh = reshape(xtemp, [length(unique(X)), length(xtemp)/length(unique(X))]);
-            ytemp = Y(find(Z==z(2)));
-            y_mesh = reshape(ytemp, [length(unique(Y)), length(ytemp)/length(unique(Y))]);
-            e_temp = Ez(find(Z==z(2)));
+            e_temp = Ez(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
             pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 

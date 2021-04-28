@@ -94,17 +94,22 @@ clear Edata Hdata Pdata SCdata;
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
     
 %% Visualization of Power flow 
-    
     clc;
     layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                    % which thelayers and fields want to be visualized. 
+                       % which thelayers and fields want to be visualized. 
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
                                     %to be ploted at the 3D figure            
     plotPowerFlow(X, Y, Z, Px, Py, Pz, layers, size_layers); 
+    
+%% Vilualization of Impedance
+    clc;
+    layers = [49,100]; % Distance in milimeters in z direction from the aperture at   
+                       % which the impedance want to be visualized.
+    impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)
 %% PTP algorithm 
 
-% obtain layers
-% clear variables not interested in to save memory
+% Obtain layers
+% Clear variables not interested in to save memory
 
 
 
