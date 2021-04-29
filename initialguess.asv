@@ -1,0 +1,7 @@
+% This function implement a initial guess for the phase of the field
+% desired. 
+function initialguess(x_mesh, y_mesh, layers)
+    ap_dim =[7.2,10.13]; % Size of the aperture of the aut
+    z
+    Maut = 
+end

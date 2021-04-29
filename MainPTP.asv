@@ -5,7 +5,7 @@
 %               1. Visualization of the Electric Field, Magnetic Field, Far
 %               Field, Power flow. 
 
-%% Preallocation Variables and Loading Experimental and Simulated Data
+%% Preallocation of Variables and Loading Experimental and Simulated Data
 clear all; clc; close all force; 
  
 % Loading data from CST 
@@ -68,7 +68,14 @@ NumberHPlanes = length(unique(Edata(:,1))); % Number of H planes = 53
     % The first plane is at x=-26 (plane yz)
     % The last plane is at x=26 (plane yz)
 
-clear Edata Hdata Pdata SCdata;
+% Input parameters visualization
+
+    layers = [-14,30]; % Distance in milimeters in z direction from the aperture at   
+                    % which the layers and fields want to be visualized or obtained.  
+    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
+                                    %to be ploted at the 3D figure
+                                    
+clear Edata Hdata Pdata SCdata; clc;
  
 %% Visualization Far Field
     % TO-DO Implement nargin et nargout if neccesary
@@ -77,40 +84,48 @@ clear Edata Hdata Pdata SCdata;
            % inputs           
            % Explain the argumets use
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
-
-%% Visualization of E field.
-    clc;
-    layers = [15,30]; % Distance in milimeters in z direction from the aperture at   
-                    % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
-    plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);    
-%% Visualization of H field.
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                    % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
+                                    
+%% Visualization of E field.            
+    plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
+    
+%% Visualization of H field.           
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
     
-%% Visualization of Power flow 
-    clc;
-    layers = [1,15.8]; % Distance in milimeters in z direction from the aperture at   
-                       % which thelayers and fields want to be visualized. 
-    size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
-                                    %to be ploted at the 3D figure            
+%% Visualization of Power flow            
     plotPowerFlow(X, Y, Z, Px, Py, Pz, layers, size_layers); 
     
-    example of power calculated directed from 
-    %[Pcx,Pcy,Pcz]=calculatePower(Ex, Ey, Ez, Hx, Hy, Hz);
-    %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
-%% Vilualization of Impedance
-    clc;
-    layers = [49,100]; % Distance in milimeters in z direction from the aperture at   
-                       % which the impedance want to be visualized.
-    impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)
+    % Example of power calculated directed from E and H:
+        %[Pcx,Pcy,Pcz]=calculatePower(Ex, Ey, Ez, Hx, Hy, Hz);
+        %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
+        
+%% Visualization of Impedance
+    impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
 %% PTP algorithm 
-
+    clc
+    f = 60e9; % Frequency of the signal
+    lambda = 3e8/f; % Wavelength of the signal
+    layers = [5, 6]; % Distance in milimeters in z direction 
+                     % from the aperture for the PTP algorithm 
+    
+    %Getting the fields to work with
+    [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
+    %Fields --> M<P   (M=magnitude) (P=Phase)
+        %Getting the magnitude of the fields (Input of the algorithm) 
+            M=abs(f_mesh);
+        %Getting the phases of the fieldls (for testing the algorithm)
+            P=angle(f_mesh);
+            
+     [x_mesh, y_mesh, g_mesh]= getFieldLayer(X, Y, Z, Hx, layers); 
+            M1=abs(g_mesh);
+            P1=angle(g_mesh);
+    
+     calculatePropagationMatrix(x_mesh, y_mesh, layers, lambda)
+    %a = abs(rad2deg(P(:,:,1) - P(:,:,2)))-72;
+    %close all
+    %surf(x_mesh,y_mesh, a);
+    %colorbar     
+            
+        % (angle(exp([1:10]*1e-3*1i*2*pi/lambda)))    
 % Obtain layers
 % Clear variables not interested in to save memory
 
