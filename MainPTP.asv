@@ -130,13 +130,13 @@ clear Edata Hdata Pdata SCdata; clc;
           %Propagating initial guess to first layer
             field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [0 layers(1)], lambda);
           %Replace amplitudes estimated by measurements/simulated
-            field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
+            field_layer1 = M(:,:,1)*exp(1i*angle(field_layer1));
       
       %LAYER 2 
           %Propagating initial guess to first layer
             field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda);
           %Replace amplitudes estimated by measurements/simulated
-            field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
+            field_layer2 = M(:,:,2)*exp(1i*angle(field_layer2));
         
       %Backpropagate 
         
@@ -144,8 +144,8 @@ clear Edata Hdata Pdata SCdata; clc;
         close all
         subplot(2,2,1); surf(x_mesh,y_mesh, abs(field_layer1)); view(0,90); title('Layer 1 Mag');   colorbar ; 
         subplot(2,2,2); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 1 Phas');   colorbar ; 
-        subplot(2,2,3); surf(x_mesh,y_mesh, abs(field_layer2)); view(0,90); title('Layer 2 Mag');   colorbar ; 
-        subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_layer2)); view(0,90); title('Layer 2 Phas');   colorbar ; 
+        subplot(2,2,3); surf(x_mesh,y_mesh, abs(field_layer1)); view(0,90); title('Layer 2 Mag');   colorbar ; 
+        subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 2 Phas');   colorbar ; 
         
         %close all
         %subplot(2,2,1); surf(x_mesh,y_mesh, angle((f_mesh(:,:,1)))); view(0,90); title('Mesh 0');   colorbar ; 
