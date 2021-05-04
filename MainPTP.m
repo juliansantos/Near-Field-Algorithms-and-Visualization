@@ -85,7 +85,8 @@ clear Edata Hdata Pdata SCdata; clc;
            % Explain the argumets use
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
                                     
-%% Visualization of E field.            
+%% Visualization of E field.         
+    layers=[15,38.6];
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
     
 %% Visualization of H field.           
@@ -99,12 +100,13 @@ clear Edata Hdata Pdata SCdata; clc;
         %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
         
 %% Visualization of Impedance
+    layers = [1,51];
     impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
 %% PTP algorithm 
     clc
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [5, 6]; % Distance in milimeters in z direction 
+    layers = [5, 20]; % Distance in milimeters in z direction 
                      % from the aperture for the PTP algorithm 
     
     %Getting the fields to work with
@@ -112,25 +114,42 @@ clear Edata Hdata Pdata SCdata; clc;
     %Fields --> M<P   (M=magnitude) (P=Phase)
         %Getting the magnitude of the fields (Input of the algorithm) 
             M=abs(f_mesh);
-        %Getting the phases of the fieldls (for testing the algorithm)
+        %Getting the phases of the fields (for testing the algorithm)
             P=angle(f_mesh);
+          
             
-     [x_mesh, y_mesh, g_mesh]= getFieldLayer(X, Y, Z, Hx, layers); 
-            M1=abs(g_mesh);
-            P1=angle(g_mesh);
+     %[x_mesh, y_mesh, g_mesh]= getFieldLayer(X, Y, Z, Hx, layers); 
+     %       M1=abs(g_mesh);
+     %       P1=angle(g_mesh);
     
     
-     prop_matrix = calculatePropagationMatrix(x_mesh, y_mesh, layers, lambda);
-    a = abs(rad2deg(P(:,:,1) - P(:,:,2)))-72;
-    close all
-    subplot(2,4,1); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0))); view(0,90);    colorbar ;
-    subplot(2,4,2); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0.1))); view(0,90);    colorbar ;
-    subplot(2,4,3); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0.3))); view(0,90);    colorbar ;
-    subplot(2,4,4); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*2))); view(0,90);    colorbar ;
-    subplot(2,4,5); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*3))); view(0,90);    colorbar ;
-    subplot(2,4,6); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*3.1))); view(0,90);    colorbar ;
-    subplot(2,4,7); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*4))); view(0,90);    colorbar ;
-    subplot(2,4,8); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*5))); view(0,90);    colorbar ;
+      %Initial guess enter to function calculate Propagation Matrix and 
+      	Maut = initialguess(x_mesh, y_mesh);
+            
+      %Propagating initial guess to first layer
+        prop_matrix = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [0 layers(1)], lambda);
+     
+      %Replace amplitudes estimated by measurements/simulated
+        
+      %Backpropagate 
+        
+      
+        close all
+        subplot(2,2,1); surf(x_mesh,y_mesh, abs((Maut))); view(0,90); title('Mesh 0');   colorbar ; 
+        subplot(2,2,2); surf(x_mesh,y_mesh, abs(prop_matrix)); view(0,90); title('Mesh 1');   colorbar ; 
+        subplot(2,2,3); surf(x_mesh,y_mesh, rad2deg(angle(prop_matrix))); view(0,90); title('Estimated mesh 1');    colorbar ;
+        
+        %See the behaviour of the phase  
+        %close all 
+        %a = abs(rad2deg(P(:,:,1) - P(:,:,2)))-72;
+        %subplot(2,4,1); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0))); view(0,90);    colorbar ;
+        %subplot(2,4,2); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0.1))); view(0,90);    colorbar ;
+        %subplot(2,4,3); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*0.3))); view(0,90);    colorbar ;
+        %subplot(2,4,4); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*2))); view(0,90);    colorbar ;
+        %subplot(2,4,5); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*3))); view(0,90);    colorbar ;
+        %subplot(2,4,6); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*3.1))); view(0,90);    colorbar ;
+        %subplot(2,4,7); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*4))); view(0,90);    colorbar ;
+        %subplot(2,4,8); surf(x_mesh,y_mesh, angle(P(:,:,1)*exp(-1i*2*pi*5))); view(0,90);    colorbar ;
 
     
             
