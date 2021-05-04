@@ -23,9 +23,5 @@ function prop_matrix = calculatePropagationMatrix(x_mesh, y_mesh, field, layers,
     %prop_matrix = trapz(trapz(value));
 % As an example enter the electrical field in x at a specific layer and see
 % the behaviour. 
-
-
-
-   
     
 end 

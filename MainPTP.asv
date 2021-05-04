@@ -106,7 +106,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [5, 40]; % Distance in milimeters in z direction 
+    layers = [5, 15]; % Distance in milimeters in z direction 
                      % from the aperture for the PTP algorithm 
     
     %Getting the fields to work with
@@ -125,27 +125,45 @@ clear Edata Hdata Pdata SCdata; clc;
     
       %Initial guess enter to function calculate Propagation Matrix and 
       	Maut = initialguess(x_mesh, y_mesh);
-            
-      %LAYER 1  
+      
+      cycles = 1;
+      error = zeros(1,cycles);
+      
+
+      %AUT to Layer 1  
           %Propagating initial guess to first layer
             field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [0 layers(1)], lambda);
           %Replace amplitudes estimated by measurements/simulated
-            field_layer1 = M(:,:,1)*exp(1i*angle(field_layer1));
-      
-      %LAYER 2 
-          %Propagating initial guess to first layer
+            field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
+            
+     for i =1:cycles           
+      %Layer 1 to Layer 2 
+          %Propagating layer 1 to layer 2
             field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda);
           %Replace amplitudes estimated by measurements/simulated
-            field_layer2 = M(:,:,2)*exp(1i*angle(field_layer2));
+            field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
         
-      %Backpropagate 
-        
+      %Layer 2 to Layer 1 
+          %Propagating initial guess to first layer
+            field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda);
+            
+      % check criteria of error field_layer1 vs measurements see behaviour
+      % in time -> MSE 
+      
+            error(i) = sum((abs(field_layer1) - M(:,:,1))./M(:,:,1), 'all');
+      
+          %Replace amplitudes estimated by measurements/simulated
+              
+            
+        subplot(2,2,1); surf(x_mesh,y_mesh, mag2db(abs(field_layer1))); view(0,90); title('Layer 1 Mag');   colorbar ; shading interp; 
+        subplot(2,2,2); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 1 Phas');   colorbar ; shading interp; 
+        subplot(2,2,3); surf(x_mesh,y_mesh, mag2db(abs(field_layer2))); view(0,90); title('Layer 2 Mag');   colorbar ; shading interp; 
+        subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_layer2)); view(0,90); title('Layer 2 Phas');   colorbar ; shading interp; 
+        pause();field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
+      end 
       
         close all
-        subplot(2,2,1); surf(x_mesh,y_mesh, abs(field_layer1)); view(0,90); title('Layer 1 Mag');   colorbar ; 
-        subplot(2,2,2); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 1 Phas');   colorbar ; 
-        subplot(2,2,3); surf(x_mesh,y_mesh, abs(field_layer1)); view(0,90); title('Layer 2 Mag');   colorbar ; 
-        subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 2 Phas');   colorbar ; 
+
         
         %close all
         %subplot(2,2,1); surf(x_mesh,y_mesh, angle((f_mesh(:,:,1)))); view(0,90); title('Mesh 0');   colorbar ; 
