@@ -9,19 +9,19 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/EField_z1mm_xy_1mm.txt'); 
+Edata = load('Data/EField_z1mm_xy_0.25mm.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
     %                           EyRe [V/m], EyIm [V/m], 
     %                           EzRe [V/m], EzIm [V/m].
         
-Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
+Hdata = load('Data/HField_z1mm_xy_0.25mm.txt'); 
     % Magnetic Field Columns:   x[mm], y[mm], z[mm],
     %                           HxRe [A/m], HxIm [A/m], 
     %                           HyRe [A/m], HyIm [A/m], 
     %                           HzRe [A/m], HzIm [A/m].
     
-Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
+Pdata= load('Data/PowerFlow_z1mm_xy_0.25mm.txt'); 
     % Power Flow Columns: x [mm], y [mm], z [mm], 
     %                     Px [V.A/m^2], 
     %                     Py [V.A/m^2], 
@@ -89,7 +89,8 @@ clear Edata Hdata Pdata SCdata; clc;
     layers=[15,38.6];
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
     
-%% Visualization of H field.           
+%% Visualization of H field.  
+    layers=[15,38.6];
     plotMagneticField(X, Y, Z, Hx, Hy, Hz, layers, size_layers); 
     
 %% Visualization of Power flow            
@@ -124,7 +125,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [1, 6]; % Distance in milimeters in z direction 
+    layers = [1, 15]; % Distance in milimeters in z direction 
                      % from the aperture for the PTP algorithm 
     
     %Getting the fields to work with
@@ -144,11 +145,15 @@ clear Edata Hdata Pdata SCdata; clc;
       %Initial guess enter to function calculate Propagation Matrix and 
         Maut = initialguess(x_mesh, y_mesh);
       
+        %Plot initial guess
+        subplot(1,2,1); surf(x_mesh,y_mesh, (abs(Maut))); title('|Layer 1| Initial guess');   colorbar ; shading interp; view(0,90);
+        subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
+        
       %Preallocating and starting variables for iterations 
-        cycles = 4000;
+        cycles = 100;
         error = zeros(1,cycles);
       
-       %Maut = abs(getFieldLayer(X, Y, Z, Ex, 1)); % to test with the sim.
+       %Maut = abs(getFieldLayer(X, Y, Z, Ex, 0)); % to test with the sim.
        %data
        
       %AUT to Layer 1  
@@ -156,33 +161,35 @@ clear Edata Hdata Pdata SCdata; clc;
             field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [0 layers(1)], lambda);
           %Replace amplitudes estimated by measurements/simulated
             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
-
+        
+     %figure('units','normalized','outerposition',[0 0 1 1])
      for i =1:cycles           
       %Layer 1 to Layer 2 
           %Propagating layer 1 to layer 2
-            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda);
+            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp2 = field_layer2;
           %Replace amplitudes estimated by measurements/simulated
             field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
         
       %Layer 2 to Layer 1 
           %Propagating initial guess to first layer
-            [field_layer1, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda);
-          %Plot in real time the iterations behaviour -- comment this
-          %section in case you want better time efficiency
-             plotIterationsIFT(i, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), factor, field_layer1)
-            
-      %Stop criteria: iterations or error
-            error(i) = sum((abs(field_layer1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-      
+            [field_layer1, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda); temp1 = field_layer1;
           %Replace amplitudes estimated by measurements/simulated 
-           field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
-     end 
-        close all
-        subplot(2,2,1); surf(x_mesh,y_mesh, mag2db(abs(field_layer1))); view(0,90); title('Layer 1 Mag');   colorbar ; shading interp; view(35,35);
-        subplot(2,2,2); surf(x_mesh,y_mesh, angle(field_layer1)); view(0,90); title('Layer 1 Phas');   colorbar ; shading interp;  view(35,35);
-        subplot(2,2,3); surf(x_mesh,y_mesh, mag2db(abs(field_layer2))); view(0,90); title('Layer 2 Mag');   colorbar ; shading interp;  view(35,35);
-        subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_layer2)); view(0,90); title('Layer 2 Phas');   colorbar ; shading interp;  view(35,35);
+             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
+           
+          %Plot in real time the iterations behaviour -- comment this section in case you want better time efficiency
+             %plotIterationsIFT(i, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1)
+          %Plot in real time just the phase retrieval
+             %subplot(1,2,1); cla; surf(x_mesh,y_mesh, mag2db(abs(field_layer1)));  title(['|Layer 1| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
+             %subplot(1,2,2); cla; surf(x_mesh,y_mesh, angle(field_layer1));  title(['< Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90);
 
+      %Stop criteria: iterations or error
+            error(i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
+      
+          
+     end 
+        %close all
+        figure('units','normalized','outerposition',[0 0 1 1])
+        plotIterationsIFT(cycles*1.0, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1)
         figure; plot(error);
         
 
