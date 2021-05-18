@@ -6,7 +6,7 @@
 
 function [ifft_fact, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field, layers, lambda)
     
-    xref = 0; yref = 0; zref = 15.2 ;
+    xref = 0; yref = 0; zref = -15.2 ;
     ko = 2 * pi/lambda;
     %kx = ko *x_mesh*1e-3;
     %ky = ko *y_mesh*1e-3;
@@ -23,11 +23,7 @@ function [ifft_fact, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field,
     %Method 1 ifft - fft:
         if method == 1
             fft_field = ((fft2(field)));
-            ifft_fact = (ifft2((fft_field.*factor)));
-            
-            %figure;
-            %surf(abs(fft_field));
-            %figure;
+            ifft_fact = ifft2(fft_field.*factor);
     %Method 2 idft - dft: 
         elseif method == 2
             pws = zeros(size(kx));

@@ -1,4 +1,4 @@
-function plotIterationIFT(i, x_mesh, y_mesh, M_layer1, M_layer2, factor, ME_layer1)
+function plotIterationIFT(i, x_mesh, y_mesh, M_layer1, M_layer2, ME_layer2, ME_layer1)
     % i: iteration number i
     % M_layer1 : magnitude fields layer 1 -> simulated/measured
     % M_layer2: magnitude fileds layer 2 -> simulated/measured
@@ -17,8 +17,8 @@ function plotIterationIFT(i, x_mesh, y_mesh, M_layer1, M_layer2, factor, ME_laye
     
     subplot(2,4,3); cla; surf(x_mesh,y_mesh, mag2db(abs(ME_layer1)));  title(['|Layer 1| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
     subplot(2,4,7); cla; surf(x_mesh,y_mesh, angle(ME_layer1));  title(['\angle Layer 1 -- Estimated Values iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-    subplot(2,4,4); cla; surf(x_mesh,y_mesh, mag2db(abs(factor)));  title(['|Layer 2| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-    subplot(2,4,8); cla; surf(x_mesh,y_mesh, angle(factor));  title(['\angle Layer 2 -- Estimated Values iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);   
+    subplot(2,4,4); cla; surf(x_mesh,y_mesh, mag2db(abs(ME_layer2)));  title(['|Layer 2| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
+    subplot(2,4,8); cla; surf(x_mesh,y_mesh, angle(ME_layer2));  title(['\angle Layer 2 -- Estimated Values iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);   
     pause(1e-3)
     
     
