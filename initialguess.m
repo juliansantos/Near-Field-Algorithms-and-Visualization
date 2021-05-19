@@ -1,6 +1,6 @@
 % This function implement a initial guess for the phase of the field
 % desired. 
-function Maut = initialguess(x_mesh, y_mesh, field)
+function Maut = initialguess(x_mesh, y_mesh, field, layer_1)
     ap_dim =[7.2,10.13]; % Size of the aperture of the aut
         
     % Initial guess: (Basic approach) 1<0 iff x,y E aperture otherwise 0
@@ -23,7 +23,14 @@ function Maut = initialguess(x_mesh, y_mesh, field)
         
         Maut = Maut .* exp(-1i*k0*(x_mesh*sin(theta)*cos(phi) + y_mesh*sin(theta)*sin(phi)));
     elseif Method == 3
-       bmi = imgbw(field,max(max(field))/sqrt(2));
+       bmi = im2bw(abs(f_mesh(:,:,1))/max(max(abs(f_mesh(:,:,1)))),1/sqrt(2));
+       x_center = mean(x_mesh(bmi==1)); % Orientation center
+       y_center = mean(y_mesh(bmi==1)); % Orientation center
+       [TH,PHI,~] = cart2sph(x_center,y_center,layer_1) ;
+       I = exp(-1i*k0*(x_mesh*sin(TH)*cos(PHI) + y_mesh*sin(TH)*sin(PHI)));
+       
+       % convert current to electric field. 
+       
     end
     % Initial guess: (evolutive algorithm approach)
     

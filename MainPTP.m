@@ -153,7 +153,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc;
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [3, 50]; % Distance from the aperture in mm of the layers 1,2
+    layers = [25, 50]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
     % Visualization options 
@@ -173,7 +173,7 @@ clear Edata Hdata Pdata SCdata; clc;
           
     
     %Initial guess enter to function calculate Propagation Matrix and 
-     Maut = initialguess(x_mesh, y_mesh);
+     Maut = initialguess(x_mesh, y_mesh, f_mesh(:,:,1), layers(1));
       
         %Plot initial guess
         %subplot(1,2,1); surf(x_mesh,y_mesh, (abs(Maut))); title('|Layer 1| Initial guess');   colorbar ; shading interp; view(0,90);
