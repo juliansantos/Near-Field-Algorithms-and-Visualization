@@ -153,8 +153,15 @@ clear Edata Hdata Pdata SCdata; clc;
     clc;
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [10, 15]; % Distance in milimeters in z direction 
-                     % from the aperture for the PTP algorithm 
+    layers = [3, 50]; % Distance from the aperture in mm of the layers 1,2
+                       % for the PTP algorithm 
+    
+    % Visualization options 
+        % 0: Only show the final result
+        % 1: Animate in iterations layers 1 and 2 
+        % 2: Only animate phase evolution
+        % 3: 
+        % Note in all visualization are shown 
     
     %Getting the fields to work with
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
@@ -164,21 +171,16 @@ clear Edata Hdata Pdata SCdata; clc;
         %Getting the phases of the fields (for testing the algorithm)
             P=angle(f_mesh);
           
-            
-     %[x_mesh, y_mesh, g_mesh]= getFieldLayer(X, Y, Z, Hx, layers); 
-     %       M1=abs(g_mesh);
-     %       P1=angle(g_mesh);
     
-    
-      %Initial guess enter to function calculate Propagation Matrix and 
-        Maut = initialguess(x_mesh, y_mesh);
+    %Initial guess enter to function calculate Propagation Matrix and 
+     Maut = initialguess(x_mesh, y_mesh);
       
         %Plot initial guess
         %subplot(1,2,1); surf(x_mesh,y_mesh, (abs(Maut))); title('|Layer 1| Initial guess');   colorbar ; shading interp; view(0,90);
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 30;
+        cycles = 50;
         error = zeros(1,cycles);
       
        %Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
