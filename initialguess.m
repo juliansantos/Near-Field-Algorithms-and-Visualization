@@ -6,7 +6,7 @@ function Maut = initialguess(x_mesh, y_mesh, field, layer_1)
     % Initial guess: (Basic approach) 1<0 iff x,y E aperture otherwise 0
     % Method = Basic Approach
     
-    Method = 3;
+    Method = 2;
         % Method = 1 -> Basic approach
         % Method = 2 -> Hybrid approach (requires global optimization technique)
         % Method = 3 -> Binary magnitude image

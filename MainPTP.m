@@ -9,19 +9,19 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/EField_z1mm_xy_1mm.txt'); 
+Edata = load('Data/EField_z1mm_xy_0.5mm.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
     %                           EyRe [V/m], EyIm [V/m], 
     %                           EzRe [V/m], EzIm [V/m].
         
-Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
+Hdata = load('Data/HField_z1mm_xy_0.5mm.txt'); 
     % Magnetic Field Columns:   x[mm], y[mm], z[mm],
     %                           HxRe [A/m], HxIm [A/m], 
     %                           HyRe [A/m], HyIm [A/m], 
     %                           HzRe [A/m], HzIm [A/m].
     
-Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
+Pdata= load('Data/PowerFlow_z1mm_xy_0.5mm.txt'); 
     % Power Flow Columns: x [mm], y [mm], z [mm], 
     %                     Px [V.A/m^2], 
     %                     Py [V.A/m^2], 
@@ -86,7 +86,7 @@ clear Edata Hdata Pdata SCdata; clc;
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
                                     
 %% Visualization of E field.         
-    layers=[4,27];
+    layers=[50,51];
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
     
 %% Visualization of H field.  
@@ -101,7 +101,7 @@ clear Edata Hdata Pdata SCdata; clc;
         %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
 
 %% Visualization of Impedance
-    layers = [10,11];
+    layers = [10,51];
     impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
     
 %% Test Propagation Function
@@ -153,7 +153,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc;
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [25, 50]; % Distance from the aperture in mm of the layers 1,2
+    layers = [3, 6]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
     % Visualization options 
@@ -180,10 +180,11 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 50;
+        cycles = 60;
         error = zeros(1,cycles);
+        error2= error; 
       
-       %Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
+       Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
        %data
        
       %AUT to Layer 1  
@@ -214,14 +215,16 @@ clear Edata Hdata Pdata SCdata; clc;
 
       %Stop criteria: iterations or error
             error(i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-      
+            error2(i) = sum((abs(temp2) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
           
      end 
         close all
         figure('units','normalized','outerposition',[0 0 1 1])
         plotIterationsIFT(cycles*1.0, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1)
-        figure; plot(error); title('Amplitude difference per iterations ' )
-        figure; 
+        figure; plot(error); title('Error Layer1 per iterations ' )
+        figure; plot(error2); title('Error Layer2 per iterations ' )
+        
+        figure;
         subplot(2,3,1); cla; surf(x_mesh,y_mesh, mag2db(abs(f_mesh(:,:,1)-f_mesh(:,:,2))));  title(['|Layer 1| -- Delta Layer 1 Mag: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
         subplot(2,3,4); cla; surf(x_mesh,y_mesh, angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2)));  title(['\angle Layer 1 -- Estimated Values iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
         subplot(2,3,2); cla; surf(x_mesh,y_mesh, mag2db(abs(temp1-temp2)));  title(['|Layer 2| -- Delta Layer 2 Mag: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
