@@ -183,19 +183,15 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 5000; % Number of iterations for the IFT.
+        cycles = 50; % Number of iterations for the IFT.
         error = zeros(2,cycles); % Error in Magnitude on each layer per iteration.
-        
-        errorp = zeros(2,cycles); % Error in Phase in each layer per iteration.
-           % This is just used in the case of simulation for the sake of
-           % demonstrating the convergence to the true phase 
-        
+      
        Maut = abs(getFieldLayer(X, Y, Z, Ex, 1)); % to test with the sim.
        %data
        
       %AUT to Layer 1  
           %Propagating initial guess to first layer
-            field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [1 layers(1)], lambda);
+            field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [0 layers(1)], lambda);
           %Replace amplitudes estimated by measurements/simulated
             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
         
@@ -228,15 +224,14 @@ clear Edata Hdata Pdata SCdata; clc;
       %Stop criteria: iterations or error
             error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
             error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
-            errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all')/sum(P(:,:,1).^2,'all');
-            errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all')/sum(P(:,:,2).^2,'all');
+            
             if error(1,i)<threshold || i>=cycles 
                flag = 0;
             end
             i = i+1;
      end 
         % Plot results
-        plotResults(f_mesh,x_mesh, y_mesh, temp, error, errorp, V, cycles);
+        plotResults(f_mesh,x_mesh, y_mesh, temp, error, V, cycles);
         
 % Clear variables not interested in to save memory
 

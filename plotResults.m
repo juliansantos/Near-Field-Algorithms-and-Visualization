@@ -1,12 +1,17 @@
-function plotResults(f_mesh, x_mesh, y_mesh, temp, error, V, i)
+function plotResults(f_mesh, x_mesh, y_mesh, temp, error, errorp, V, i)
 
     if  V ~=0 
         figure('Name','Simulated and estimated values using PTP algorithm','units','normalized','outerposition',[0 0 1 1])
         plotIterationsIFT(i*1.0, x_mesh, y_mesh, f_mesh, temp)
     end 
     
-    figure; plot(error(1,:)); title('Error Layer1 per iterations ' )
-    figure; plot(error(2,:)); title('Error Layer2 per iterations ' )
+    figure; plot(error(1,:)); hold on;
+    plot(error(2,:)); title('Error in Magnitud per iterations' )
+    legend('Layer1', 'Layer2'); grid on;
+    
+    figure; plot(errorp(1,:)); hold on;
+    plot(errorp(2,:)); title('Error in Phase per iterations' )
+    legend('Layer1', 'Layer2'); grid on;
 
     % Difference in phase layer 1 and 2: Simulated data
         delta_ang_sim_l12 = wrapToPi(angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2))- angle(f_mesh(51,53,1))+angle(f_mesh(52,53,2))); 
