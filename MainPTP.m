@@ -153,7 +153,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc;
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [3, 6]; % Distance from the aperture in mm of the layers 1,2
+    layers = [3, 4]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
     % Visualization options (Variable V)
@@ -183,7 +183,7 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 100; % Number of iterations for the IFT.
+        cycles = 50; % Number of iterations for the IFT.
         error = zeros(2,cycles); % Error in each layer per iteration.
       
        Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
@@ -204,26 +204,26 @@ clear Edata Hdata Pdata SCdata; clc;
      while  flag~=0           
       %Layer 1 to Layer 2 
           %Propagating layer 1 to layer 2
-            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp2 = field_layer2;
+            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp(:,:,2) = field_layer2;
           %Replace amplitudes estimated by measurements/simulated
             field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
         
       %Layer 2 to Layer 1 
           %Propagating initial guess to first layer
-            [field_layer1, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda); temp1 = field_layer1;
+            [field_layer1, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda); temp(:,:,1) = field_layer1;
           %Replace amplitudes estimated by measurements/simulated 
              field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
            
           %Animation of estimated values using PTP algorithm
-             if V==0, plotIterationsIFT(i, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1), end
+             if V==0, plotIterationsIFT(i, x_mesh, y_mesh, f_mesh, temp), end
           %Animation only for phase convergence
              if V==1
                  subplot(1,2,1); cla; surf(x_mesh,y_mesh, mag2db(abs(field_layer1)));  title(['|Layer 1| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
                  subplot(1,2,2); cla; surf(x_mesh,y_mesh, angle(field_layer1));  title(['< Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90), pause(1e-3);
              end
       %Stop criteria: iterations or error
-            error(1,i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-            error(2,i) = sum((abs(temp2) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
+            error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
+            error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
             
             if error(1,i)<threshold || i>=cycles 
                flag = 0;
@@ -231,7 +231,7 @@ clear Edata Hdata Pdata SCdata; clc;
             i = i+1;
      end 
         % Plot results
-        plotResults(f_mesh,x_mesh, y_mesh,temp1,temp2,error,V,cycles);
+        plotResults(f_mesh,x_mesh, y_mesh, temp, error, V, cycles);
         
 % Clear variables not interested in to save memory
 
