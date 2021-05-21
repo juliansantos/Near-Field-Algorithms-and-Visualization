@@ -1,4 +1,4 @@
-function plotIterationIFT(i, x_mesh, y_mesh, M_layer1, M_layer2, ME_layer2, ME_layer1)
+function plotIterationsIFT(i, x_mesh, y_mesh, M_layer1, M_layer2, ME_layer2, ME_layer1)
     % i: iteration number i
     % M_layer1 : magnitude fields layer 1 -> simulated/measured
     % M_layer2: magnitude fileds layer 2 -> simulated/measured

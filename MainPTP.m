@@ -156,13 +156,16 @@ clear Edata Hdata Pdata SCdata; clc;
     layers = [3, 6]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
-    % Visualization options 
-        % 0: Only show the final result
-        % 1: Animate in iterations layers 1 and 2 
+    % Visualization options (Variable V)
+        % 0: Show animation convergence phase and magnitude, error and best case scenario.  
+        % 1: Show animation convergence phase, error and best case scenario.
         % 2: Only animate phase evolution
         % 3: 
         % Note in all visualization are shown 
-    
+        
+    %Please select the type of visualization
+        V = 1;
+        
     %Getting the fields to work with
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
     %Fields --> M<P   (M=magnitude) (P=Phase)
@@ -180,9 +183,8 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 60;
-        error = zeros(1,cycles);
-        error2= error; 
+        cycles = 100; % Number of iterations for the IFT.
+        error = zeros(2,cycles); % Error in each layer per iteration.
       
        Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
        %data
@@ -193,7 +195,9 @@ clear Edata Hdata Pdata SCdata; clc;
           %Replace amplitudes estimated by measurements/simulated
             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
         
-     figure('units','normalized','outerposition',[0 0 1 1])
+     if V==0, figure('Name','Simulated and estimated values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
+     if V==1, figure('Name','Estimated phase values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
+     
      for i =1:cycles           
       %Layer 1 to Layer 2 
           %Propagating layer 1 to layer 2
@@ -207,35 +211,21 @@ clear Edata Hdata Pdata SCdata; clc;
           %Replace amplitudes estimated by measurements/simulated 
              field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
            
-          %Plot in real time the iterations behaviour -- comment this section in case you want better time efficiency
-             plotIterationsIFT(i, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1)
-          %Plot in real time just the phase retrieval
-             %subplot(1,2,1); cla; surf(x_mesh,y_mesh, mag2db(abs(field_layer1)));  title(['|Layer 1| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-             %subplot(1,2,2); cla; surf(x_mesh,y_mesh, angle(field_layer1));  title(['< Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90);
-
+          %Animation of estimated values using PTP algorithm
+             if V==0, plotIterationsIFT(i, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1), end
+          %Animation only for phase convergence
+             if V==1
+                 subplot(1,2,1); cla; surf(x_mesh,y_mesh, mag2db(abs(field_layer1)));  title(['|Layer 1| -- Estimated Values iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
+                 subplot(1,2,2); cla; surf(x_mesh,y_mesh, angle(field_layer1));  title(['< Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90), pause(1e-3);
+             end
       %Stop criteria: iterations or error
-            error(i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-            error2(i) = sum((abs(temp2) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
+            error(1,i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
+            error(2,i) = sum((abs(temp2) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
           
      end 
-        close all
-        figure('units','normalized','outerposition',[0 0 1 1])
-        plotIterationsIFT(cycles*1.0, x_mesh, y_mesh, f_mesh(:,:,1), f_mesh(:,:,2), temp2, temp1)
-        figure; plot(error); title('Error Layer1 per iterations ' )
-        figure; plot(error2); title('Error Layer2 per iterations ' )
+        % Plot results
+        plotResults(f_mesh,x_mesh, y_mesh,temp1,temp2,error,V,cycles);
         
-        figure;
-        subplot(2,3,1); cla; surf(x_mesh,y_mesh, mag2db(abs(f_mesh(:,:,1)-f_mesh(:,:,2))));  title(['|Layer 1| -- Delta Layer 1 Mag: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-        subplot(2,3,4); cla; surf(x_mesh,y_mesh, angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2)));  title(['\angle Layer 1 -- Estimated Values iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-        subplot(2,3,2); cla; surf(x_mesh,y_mesh, mag2db(abs(temp1-temp2)));  title(['|Layer 2| -- Delta Layer 2 Mag: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-        subplot(2,3,5); cla; surf(x_mesh,y_mesh, angle(temp1)-angle(temp2));  title(['\angle Layer 2 -- Estimated Values iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);   
-        subplot(2,3,3); cla; surf(x_mesh,y_mesh, mag2db(abs(f_mesh(:,:,1)-f_mesh(:,:,2)))-mag2db(abs(temp1-temp2)));  title(['|Layer 2| -- Delta Layer 2 Mag: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-        subplot(2,3,6); cla; surf(x_mesh,y_mesh, angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2)) - angle(temp1)+angle(temp2));  title(['\angle Layer 2 -- Estimated Values iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);  
-
-    
-            
-        % (angle(exp([1:10]*1e-3*1i*2*pi/lambda)))    
-% Obtain layers
 % Clear variables not interested in to save memory
 
 
