@@ -150,7 +150,7 @@ clear Edata Hdata Pdata SCdata; clc;
     subplot(1,2,1); surf(x_mesh,y_mesh, (abs(t_mesh(:,:,2)))-(abs(t_mesh(:,:,1)))); view(0,90); title('Delta Sim. 1 Mag');   colorbar ; shading interp; 
     subplot(1,2,2); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2)-t_mesh(:,:,1))); view(0,90); title('Delta 1 Sim. Phas');   colorbar ; shading interp;
 %% PTP algorithm 
-    clc;
+    clc; close all force; 
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
     layers = [3, 4]; % Distance from the aperture in mm of the layers 1,2
@@ -159,7 +159,7 @@ clear Edata Hdata Pdata SCdata; clc;
     % Visualization options (Variable V)
         % 0: Show animation convergence phase and magnitude, error and best case scenario.  
         % 1: Show animation convergence phase, error and best case scenario.
-        % 2: Only animate phase evolution
+        % 2: Show final results without animation
         % 3: 
         % Note in all visualization are shown 
         
