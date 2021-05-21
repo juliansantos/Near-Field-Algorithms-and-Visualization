@@ -198,7 +198,10 @@ clear Edata Hdata Pdata SCdata; clc;
      if V==0, figure('Name','Simulated and estimated values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
      if V==1, figure('Name','Estimated phase values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
      
-     for i =1:cycles           
+     i=1;% variable for the iterations
+     flag = 1; % variable for stop criteria
+     threshold = 1e-3;
+     while  flag~=0           
       %Layer 1 to Layer 2 
           %Propagating layer 1 to layer 2
             field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp2 = field_layer2;
@@ -221,7 +224,11 @@ clear Edata Hdata Pdata SCdata; clc;
       %Stop criteria: iterations or error
             error(1,i) = sum((abs(temp1) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
             error(2,i) = sum((abs(temp2) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
-          
+            
+            if error(1,i)<threshold || i>=cycles 
+               flag = 0;
+            end
+            i = i+1;
      end 
         % Plot results
         plotResults(f_mesh,x_mesh, y_mesh,temp1,temp2,error,V,cycles);
