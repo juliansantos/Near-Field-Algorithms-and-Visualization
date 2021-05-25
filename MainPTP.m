@@ -86,7 +86,7 @@ clear Edata Hdata Pdata SCdata; clc;
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
                                     
 %% Visualization of E field.         
-    layers=[50,51];
+    layers=[3,5];
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
     
 %% Visualization of H field.  
@@ -107,7 +107,7 @@ clear Edata Hdata Pdata SCdata; clc;
 %% Test Propagation Function
     close all;
     lambda = 0.005;
-    layers = [10,51];
+    layers = [3,5];
     
     [x_mesh, y_mesh, t_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
     t_mesh(:,:,1) = Maut;
@@ -145,7 +145,7 @@ clear Edata Hdata Pdata SCdata; clc;
     %plot(field_z2(:,27)/max(field_z2(:,27)));
     
     
-    %% this is just to see delta: TODO tweak late
+    %% this is just to see delta: TODO tweaking
     figure
     subplot(1,2,1); surf(x_mesh,y_mesh, (abs(t_mesh(:,:,2)))-(abs(t_mesh(:,:,1)))); view(0,90); title('Delta Sim. 1 Mag');   colorbar ; shading interp; 
     subplot(1,2,2); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2)-t_mesh(:,:,1))); view(0,90); title('Delta 1 Sim. Phas');   colorbar ; shading interp;
@@ -164,7 +164,7 @@ clear Edata Hdata Pdata SCdata; clc;
         % Note in all visualization are shown 
         
     %Please select the type of visualization
-        V = 2;
+        V = 0;
         
     %Getting the fields to work with
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
@@ -183,12 +183,22 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 5000; % Number of iterations for the IFT.
+        cycles = 50; % Number of iterations for the IFT.
         error = zeros(2,cycles); % Error in Magnitude on each layer per iteration.
         
         errorp = zeros(2,cycles); % Error in Phase in each layer per iteration.
            % This is just used in the case of simulation for the sake of
            % demonstrating the convergence to the true phase 
+        
+        % best case variables with respect to magnitude error
+        best_case = zeros([size(Maut),2]);    
+        error_best_case = [inf, inf]; 
+        iter_best_case = [1, 1];
+        
+        % best case variables with respect to phase error
+        best_case_p = zeros([size(Maut),2]);    
+        error_best_case_p = [inf, inf]; 
+        iter_best_case_p = [1, 1];
         
        Maut = abs(getFieldLayer(X, Y, Z, Ex, 1)); % to test with the sim.
        %data
@@ -225,18 +235,47 @@ clear Edata Hdata Pdata SCdata; clc;
                  subplot(1,2,1); cla; surf(x_mesh,y_mesh, wrapToPi(P(:,:,1)-P(52,53,1)));  title(['\angle Layer 1 -- Simulated Values iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
                  subplot(1,2,2); cla; surf(x_mesh,y_mesh, wrapToPi(angle(field_layer1)-angle(field_layer1(52,53))));  title(['\angle Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90), pause(1e-3);
              end
-      %Stop criteria: iterations or error
+             
+      %Error in magnitud and phase 
             error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
             error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
             errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all')/sum(P(:,:,1).^2,'all');
             errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all')/sum(P(:,:,2).^2,'all');
+      
+      %Best case scenario in magnitude error layer 1       
+            if error_best_case(1) > error(1,i) 
+                best_case(:,:,1) = temp(:,:,1);
+                error_best_case(1) = error(1,i);
+                iter_best_case(1) = i;
+            end
+       %Best case scenario in magnitude error layer 2       
+            if error_best_case(2) > error(2,i) 
+                best_case(:,:,2) = temp(:,:,2);
+                error_best_case(2) = error(2,i);
+                iter_best_case(2) = i;
+            end      
+            
+       %Best case scenario in phase error layer 1       
+            if error_best_case_p(1) > errorp(1,i) 
+                best_case_p(:,:,1) = temp(:,:,1);
+                error_best_case_p(1) = errorp(1,i);
+                iter_best_case_p(1) = i;
+            end
+       %Best case scenario in phase error layer 2       
+            if error_best_case_p(2) > errorp(2,i) 
+                best_case_p(:,:,2) = temp(:,:,2);
+                error_best_case_p(2) = errorp(2,i);
+                iter_best_case_p(2) = i;
+            end    
+            
+      %Stop criteria based on number of iterations or threshold error in magnitude      
             if error(1,i)<threshold || i>=cycles 
                flag = 0;
             end
             i = i+1;
      end 
         % Plot results
-        plotResults(f_mesh,x_mesh, y_mesh, temp, error, errorp, V, cycles);
+        plotResults(f_mesh,x_mesh, y_mesh, temp, error, errorp, best_case, best_case_p, V, cycles, iter_best_case, iter_best_case_p);
         
 % Clear variables not interested in to save memory
 
