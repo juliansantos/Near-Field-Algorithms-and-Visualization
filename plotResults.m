@@ -35,9 +35,9 @@ function plotResults(f_mesh, x_mesh, y_mesh, temp, error, errorp, best_case, bes
     
     
     figure('Name','Difference in Magnitude and Phase between layers for Sim. and Est. Values ','units','normalized','outerposition',[0 0 1 1])
-    subplot(2,3,1); cla; surf(x_mesh,y_mesh, delta_mag_sim_l12);  title(['Simulation: | \Delta(L1, L2) |  iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
+    subplot(2,3,1); cla; surf(x_mesh,y_mesh, delta_mag_sim_l12);  title(['Simulation: | \Delta(L1, L2) |  iter:' num2str(i)]);   colorbar ; shading interp;  view(0,0);
     subplot(2,3,4); cla; surf(x_mesh,y_mesh, delta_ang_sim_l12);  title(['Simulation: \Delta (\angle L1, \angle L2)  iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-    subplot(2,3,2); cla; surf(x_mesh,y_mesh, delta_mag_est_l12);  title(['Estimation: | \Delta(L1, L2) |  iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,90);
+    subplot(2,3,2); cla; surf(x_mesh,y_mesh, delta_mag_est_l12);  title(['Estimation: | \Delta(L1, L2) |  iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,0);
     subplot(2,3,5); cla; surf(x_mesh,y_mesh, delta_ang_est_l12);  title(['Estimation: \Delta(\angle L1, \angle L2)  iter: ' num2str(i)]);  colorbar ; shading interp;  view(0,90);   
     subplot(2,3,3); cla; surf(x_mesh,y_mesh, delta_mag_sim_l12-delta_mag_est_l12);  title(['Sim. | \Delta(L1, L2) | - Est. | \Delta(L1, L2) |' num2str(i)]);   colorbar ; shading interp;  view(0,90);
     subplot(2,3,6); cla; surf(x_mesh,y_mesh, wrapToPi(delta_ang_sim_l12-delta_ang_est_l12));  title(['Sim. \Delta (\angle L1, \angle L2) - Est. \Delta (\angle L1, \angle L2) iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);  

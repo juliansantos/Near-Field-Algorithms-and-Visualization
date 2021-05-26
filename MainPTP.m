@@ -86,7 +86,7 @@ clear Edata Hdata Pdata SCdata; clc;
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
                                     
 %% Visualization of E field.         
-    layers=[3,5];
+    layers=[3,15];
     plotElectricField(X, Y, Z, Ex, Ey,Ez, layers, size_layers);   
     
 %% Visualization of H field.  
@@ -156,15 +156,35 @@ clear Edata Hdata Pdata SCdata; clc;
     layers = [3, 5]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
-    % Visualization options (Variable V)
-        % 0: Show animation convergence phase and magnitude, error and best case scenario.  
-        % 1: Show animation convergence phase, error and best case scenario.
-        % 2: Show final results without animation
-        % 3: 
-        % Note in all visualization are shown 
-        
     %Please select the type of visualization
-        V = 0;
+        V = 2;
+        % Visualization options (Variable V)
+            % 0: Show animation convergence phase and magnitude, error best
+            % case scenario. If the input data is simulated it will show
+            % the best approximation in terms of the error in phase and
+            % magnitude, but if it is measured data it will show it just
+            % for the first one. Also it shows the delta difference between
+            % layers. 
+            
+            % 1: Show animation just for the convergence of the phase, 
+            % also it shows the best case scenarios and deltas estimated
+            % and simulated/measured. 
+            
+            % 2: Show final results without animation: Use this option if
+            % you want to work with a remarkable amount of iterations in
+            % order to obtain the results faster. 
+        
+    %Please select the type of initial guess
+        I = 0;
+        % Initial guess option
+            % 0: There is not initial guess at Maut -> the algorithm start
+            % working with the iterations between layers
+            
+            % 1: The algorithm uses the layer nearest to the antenna
+            % aperture and propagate it to the first layer
+            
+            % 2: The algorithm uses the approach presented by Li Xiang in
+            % his master thesis (See article li_xiang_IFT.pdf)
         
     %Getting the fields to work with
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
@@ -183,7 +203,7 @@ clear Edata Hdata Pdata SCdata; clc;
         %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
         
       %Preallocating and starting variables for iterations 
-        cycles = 50; % Number of iterations for the IFT.
+        cycles = 5000; % Number of iterations for the IFT.
         error = zeros(2,cycles); % Error in Magnitude on each layer per iteration.
         
         errorp = zeros(2,cycles); % Error in Phase in each layer per iteration.
@@ -195,19 +215,21 @@ clear Edata Hdata Pdata SCdata; clc;
         error_best_case = [inf, inf]; 
         iter_best_case = [1, 1];
         
-        % best case variables with respect to phase error
+        % best case variables with respect to phase error "just for the case of simulated data"
         best_case_p = zeros([size(Maut),2]);    
         error_best_case_p = [inf, inf]; 
         iter_best_case_p = [1, 1];
         
-       Maut = abs(getFieldLayer(X, Y, Z, Ex, 1)); % to test with the sim.
+       Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
        %data
        
       %AUT to Layer 1  
           %Propagating initial guess to first layer
             field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [1 layers(1)], lambda);
           %Replace amplitudes estimated by measurements/simulated
-            field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
+            field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));            
+            
+            field_layer1 = Maut;
         
      if V==0, figure('Name','Simulated and estimated values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
      if V==1, figure('Name','Estimated phase values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end

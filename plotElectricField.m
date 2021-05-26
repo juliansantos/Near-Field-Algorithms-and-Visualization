@@ -6,7 +6,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
         % which is located the center of the aperture of the horn antenna. 
     z = [0,0];
 
-    figure;
+    figure('Name','Electric Field on two plannar regions','units','normalized','outerposition',[0 0 1 1])
     
     switch nargin 
         case 6 
