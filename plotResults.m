@@ -19,18 +19,20 @@ function plotResults(f_mesh, x_mesh, y_mesh, temp, error, errorp, best_case, bes
     xline(iter_best_case_p(2),'--b');
     legend('Layer1', 'Layer2','Difference', 'Minimum error Layer 1', 'Minimum error Layer 2'); grid on;
     
-
+    % Center coordinate to normalize
+    cx = floor(size(x_mesh,1)/2); cy = cx;
+    
     % Difference in phase layer 1 and 2: Simulated data
-        delta_ang_sim_l12 = wrapToPi(angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2))- angle(f_mesh(52,53,1))+angle(f_mesh(52,53,2))); 
+        delta_ang_sim_l12 = wrapToPi(angle(f_mesh(:,:,1))-angle(f_mesh(:,:,2))- angle(f_mesh(cx,cx+1,1))+angle(f_mesh(cx,cx+1,2))); 
     % Difference in magnitude layer 1 and 2: Simulated data    
         delta_mag_sim_l12 = abs(f_mesh(:,:,1))-abs(f_mesh(:,:,2));
     % Difference in phase layer 1 and 2: Estimated data
-        delta_ang_est_l12 = wrapToPi(angle(temp(:,:,1))-angle(temp(:,:,2))-angle(temp(52,53,1))+angle(temp(52,53,2)));
+        delta_ang_est_l12 = wrapToPi(angle(temp(:,:,1))-angle(temp(:,:,2))-angle(temp(cx,cx+1,1))+angle(temp(cx,cx+1,2)));
     % Difference in magnitud layer 1 and 2: Estimated data
-        delta_mag_est_l12 = abs(temp(:,:,2))-abs(temp(:,:,1));
-    % Layer 1 and Layer 1
-        delta_mag_sim_est_l1 = abs(f_mesh(:,:,1))-abs(temp(:,:,1));
-    % Layer 1 and Layer 1
+        delta_mag_est_l12 = abs(temp(:,:,2))-abs(temp(:,:,1)); 
+    % Layer 1 Simulated/Measured and Layer 1 Estimated
+        delta_mag_sim_est_l1 = abs(f_mesh(:,:,1))-abs(temp(:,:,1)); 
+    % Layer 2 Simulated/Measured and Layer 2 Estimated
         delta_mag_sim_est_l2 = abs(f_mesh(:,:,2))-abs(temp(:,:,2));    
     
     
@@ -40,8 +42,7 @@ function plotResults(f_mesh, x_mesh, y_mesh, temp, error, errorp, best_case, bes
     subplot(2,3,2); cla; surf(x_mesh,y_mesh, delta_mag_est_l12);  title(['Estimation: | \Delta(L1, L2) |  iter: ' num2str(i)]);   colorbar ; shading interp;  view(0,0);
     subplot(2,3,5); cla; surf(x_mesh,y_mesh, delta_ang_est_l12);  title(['Estimation: \Delta(\angle L1, \angle L2)  iter: ' num2str(i)]);  colorbar ; shading interp;  view(0,90);   
     subplot(2,3,3); cla; surf(x_mesh,y_mesh, delta_mag_sim_l12-delta_mag_est_l12);  title(['Sim. | \Delta(L1, L2) | - Est. | \Delta(L1, L2) |' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-    subplot(2,3,6); cla; surf(x_mesh,y_mesh, wrapToPi(delta_ang_sim_l12-delta_ang_est_l12));  title(['Sim. \Delta (\angle L1, \angle L2) - Est. \Delta (\angle L1, \angle L2) iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90);  
-    
+    subplot(2,3,6); cla; surf(x_mesh,y_mesh, wrapToPi(delta_ang_sim_l12-delta_ang_est_l12));  title(['Sim. \Delta (\angle L1, \angle L2) - Est. \Delta (\angle L1, \angle L2) iter:' num2str(i)]);  colorbar ; shading interp;  view(0,90); 
     
     figure('Name','Best Case Scenario: error in magnitude ','units','normalized','outerposition',[0 0 1 1])
     plotIterationsIFT(i*1.0, x_mesh, y_mesh, f_mesh, best_case)

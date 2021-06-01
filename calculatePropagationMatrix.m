@@ -13,8 +13,7 @@ function [ifft_fact, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field,
 
     [azimuth1,elevation1,~] = cart2sph(x_mesh,y_mesh,layers(1)*ones(size(x_mesh))+zref);
     kx = ko *sin(elevation1).*cos(azimuth1);
-    ky = ko *sin(elevation1).*sin(azimuth1);
-    clear azimuth1, elevation1;   
+    ky = ko *sin(elevation1).*sin(azimuth1);  
     d = (layers(2)-layers(1))*1e-3;
     factor = exp(-1i.*sqrt(ko.^2 -kx.^2-ky.^2)*d);
    

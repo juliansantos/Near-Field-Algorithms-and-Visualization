@@ -145,7 +145,7 @@ clear Edata Hdata Pdata SCdata; clc;
     %plot(field_z2(:,27)/max(field_z2(:,27)));
     
     
-    %% this is just to see delta: TODO tweaking
+    %% This is just to see delta: TODO tweaking
     figure
     subplot(1,2,1); surf(x_mesh,y_mesh, (abs(t_mesh(:,:,2)))-(abs(t_mesh(:,:,1)))); view(0,90); title('Delta Sim. 1 Mag');   colorbar ; shading interp; 
     subplot(1,2,2); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2)-t_mesh(:,:,1))); view(0,90); title('Delta 1 Sim. Phas');   colorbar ; shading interp;
@@ -153,7 +153,7 @@ clear Edata Hdata Pdata SCdata; clc;
     clc; close all force; 
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [3, 5]; % Distance from the aperture in mm of the layers 1,2
+    layers = [3, 15]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     
     %Please select the type of visualization
@@ -175,35 +175,32 @@ clear Edata Hdata Pdata SCdata; clc;
             % order to obtain the results faster. 
         
     %Please select the type of initial guess
-        I = 0;
+        I = 1;
         % Initial guess option
-            % 0: There is not initial guess at Maut -> the algorithm start
+            % 0: Not initial guess at Maut -> the algorithm start
             % working with the iterations between layers
             
-            % 1: The algorithm uses the layer nearest to the antenna
-            % aperture and propagate it to the first layer
+            % 1: The algorithm uses the nearest layer above measured/ simulated 
+            % to the antenna aperture to propagate it to the first layer
             
             % 2: The algorithm uses the approach presented by Li Xiang in
             % his master thesis (See article li_xiang_IFT.pdf)
         
-    %Getting the fields to work with
+            
+    %Getting the fields to work with (Layer 1 and 2)
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
-    %Fields --> M<P   (M=magnitude) (P=Phase)
+    
+    %Magnitude and phase of the Fields --> (M=magnitude) (P=Phase)
         %Getting the magnitude of the fields (Input of the algorithm) 
             M=abs(f_mesh);
         %Getting the phases of the fields (for testing the algorithm)
             P=angle(f_mesh);
           
-    
     %Initial guess enter to function calculate Propagation Matrix and 
-     Maut = initialguess(x_mesh, y_mesh, f_mesh(:,:,1), layers(1));
-      
-        %Plot initial guess
-        %subplot(1,2,1); surf(x_mesh,y_mesh, (abs(Maut))); title('|Layer 1| Initial guess');   colorbar ; shading interp; view(0,90);
-        %subplot(1,2,2); surf(x_mesh,y_mesh, angle(Maut));  title('\angle Layer 1-- Initial guess');   colorbar ; shading interp; view(0,90);
-        
+     [Maut, layer_aut] = initialguess(X, Y, Z, Ex, I,'plot');
+            
       %Preallocating and starting variables for iterations 
-        cycles = 5000; % Number of iterations for the IFT.
+        cycles = 10000; % Number of iterations for the IFT.
         error = zeros(2,cycles); % Error in Magnitude on each layer per iteration.
         
         errorp = zeros(2,cycles); % Error in Phase in each layer per iteration.
@@ -216,16 +213,22 @@ clear Edata Hdata Pdata SCdata; clc;
         iter_best_case = [1, 1];
         
         % best case variables with respect to phase error "just for the case of simulated data"
+            % This is aimed to show the convergence behavior of the 'real'
+            % phase with the control parameter of the magnitude of the
+            % electric field.           
         best_case_p = zeros([size(Maut),2]);    
         error_best_case_p = [inf, inf]; 
         iter_best_case_p = [1, 1];
         
-       Maut = abs(getFieldLayer(X, Y, Z, Ex, layers(1))); % to test with the sim.
-       %data
+       [~,~,Maut] = getFieldLayer(X, Y, Z, Ex, layers(1));  Maut = abs(Maut);
        
       %AUT to Layer 1  
           %Propagating initial guess to first layer
-            field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [1 layers(1)], lambda);
+            if I~=0 
+                field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [1 layers(1)], lambda); 
+            else
+                field_layer1 = 0;
+            end
           %Replace amplitudes estimated by measurements/simulated
             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));            
             
