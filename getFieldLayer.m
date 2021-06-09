@@ -19,8 +19,9 @@ function [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, F, layers)
         Luy = length(unique(Y)); % Length Unique Elements at Y
         xtemp = X(Z==layers(1));
         x_mesh = reshape(xtemp, [Lux, length(xtemp)/Lux]);
-        ytemp = Y(Z==layers(1));
-        y_mesh = reshape(ytemp, [Luy, length(ytemp)/Luy]);
+        %ytemp = Y(Z==layers(1));
+        %y_mesh = reshape(ytemp, [Luy, length(ytemp)/Luy]);
+        y_mesh = x_mesh';
         dimF = [size(x_mesh,1),size(y_mesh,2)] ;  
         
         f_mesh = zeros([dimF,length(layers)]);

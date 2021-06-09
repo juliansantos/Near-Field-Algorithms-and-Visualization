@@ -166,7 +166,7 @@ Sim = 0; % Variable to indicate measured data
     lambda = 3e8/f; % Wavelength of the signal
     layers = [3, 5]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
-    cycles = 20; % Number of iterations for the IFT.                  
+    cycles = 50; % Number of iterations for the IFT.                  
                        
     %Please select the type of visualization
         V = 0;
