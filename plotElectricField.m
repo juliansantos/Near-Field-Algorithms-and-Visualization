@@ -46,7 +46,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             subplot(2,4,3)
             e_temp = Ex(Z==z(1));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
-            pcolor(x_mesh,y_mesh,(mag2db(e_mesh)))
+            pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
             colorbar; colormap(jet);
             xlabel('x [mm]')
@@ -66,7 +66,7 @@ function plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers)
             subplot(2,4,7)
             e_temp = Ex(Z==z(2));
             e_mesh = reshape(e_temp, [size(x_mesh,1),size(y_mesh,2)]);
-            pcolor(x_mesh,y_mesh,(mag2db(e_mesh)))
+            pcolor(x_mesh,y_mesh,(mag2db(abs(e_mesh))))
             shading interp; 
             colorbar; colormap(jet);
             xlabel('x [mm]')

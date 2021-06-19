@@ -75,18 +75,18 @@ X = Edata(:,1);
 Y = Edata(:,2);
 zref = 119; 
 Z = Edata(:,3) - zref + 41.2; %
-Ex = Edata(:,7);
-Ex = db2mag(Ex); 
-Ey = Ex*0; Ez = Ey; 
+Exm = Edata(:,7);
+Exm = db2mag(Exm); 
+Eym = Exm*0; Ezm = Eym; 
 Sim = 0; % Variable to indicate measured data
 % Input parameters visualization
 
-    layers = [-14,30]; % Distance in milimeters in z direction from the aperture at   
+    layers = [3,5]; % Distance in milimeters in z direction from the aperture at   
                     % which the layers and fields want to be visualized or obtained.  
     size_layers = [50, 50; 50, 50];  % Dimension in milimeters of the layers 
                                     %to be ploted at the 3D figure
                                     
-%clear Edata Hdata Pdata SCdata; clc;
+%clear Edata Hdata Pdata SCdat a; clc;
  
 %% Visualization Far Field
     % TO-DO Implement nargin et nargout if neccesary
@@ -95,7 +95,7 @@ Sim = 0; % Variable to indicate measured data
            % inputs           
            % Explain the argumets use
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
-                                    
+    
 %% Visualization of E field.         
     layers=[3,5];
     plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers);   
@@ -107,7 +107,7 @@ Sim = 0; % Variable to indicate measured data
 %% Visualization of Power flow            
     plotPowerFlow(X, Y, Z, Px, Py, Pz, layers, size_layers); 
     
-    % Example of power calculated directed from E and H:
+    % Example of power calculated directly from E and H:
         %[Pcx,Pcy,Pcz]=calculatePower(Ex, Ey, Ez, Hx, Hy, Hz);
         %plotPowerFlow(X, Y, Z, Pcx, Pcy, Pcz, layers, size_layers); 
 
@@ -115,61 +115,16 @@ Sim = 0; % Variable to indicate measured data
     layers = [10,51];
     impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
     
-%% Test Propagation Function
-    close all;
-    lambda = 0.005;
-    layers = [3,5];
-    
-    [x_mesh, y_mesh, t_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
-    t_mesh(:,:,1) = Maut;
-    %t_mesh(:,:,1) = Maut;
-    [field_z2, factor]= calculatePropagationMatrix(x_mesh, y_mesh, Maut, layers, lambda);
-    subplot(2,5,1); surf(x_mesh,y_mesh, mag2db(abs(t_mesh(:,:,1))/max(max(abs(t_mesh(:,:,1)))))); view(0,90); title('Sim. |Layer 1| ');   colorbar ; shading interp; 
-    subplot(2,5,6); surf(x_mesh,y_mesh, angle(t_mesh(:,:,1))-angle(t_mesh(27,27,1))); view(0,90); title('Sim. Layer 1 Phase');   colorbar ; shading interp;  
-    subplot(2,5,2); surf(x_mesh,y_mesh, mag2db(abs(t_mesh(:,:,2))/max(max(abs(t_mesh(:,:,2)))))); view(0,90); title('Sim. |Layer 2|');   colorbar ; shading interp;  
-    subplot(2,5,7); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2))-angle(t_mesh(27,27,2))); view(0,90); title('Sim. Layer 2 Phase');   colorbar ; shading interp; 
-    
-    
-    subplot(2,5,4); surf(x_mesh,y_mesh, mag2db(abs(field_z2)/max(max(abs(field_z2))))); view(0,90); title('Est. |Layer 2|');   colorbar ; shading interp;  
-    subplot(2,5,9); surf(x_mesh,y_mesh, angle(field_z2)-angle(field_z2(27,27))); view(0,90); title('Est Phase Layer 2');   colorbar ; shading interp;  
-    
-    subplot(2,5,5); surf(x_mesh,y_mesh, (abs(t_mesh(:,:,2))/max(max(abs(t_mesh(:,:,2)))))-(abs(field_z2)/max(max(abs(field_z2))))); view(0,90); title('Error Mag.');   colorbar ; shading interp; 
-    subplot(2,5,10); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2))-angle(field_z2)); view(0,90); title('Error Phase');   colorbar ; shading interp;
-    
-    subplot(2,5,3); surf(x_mesh,y_mesh, mag2db(abs(factor))); view(0,90); title('|Factor| ');   colorbar ; shading interp;  
-    subplot(2,5,8); surf(x_mesh,y_mesh, angle(factor)); view(0,90); title('Phase Factor');   colorbar ; shading interp;  
-    
-    %subplot(2,2,1); surf(x_mesh,y_mesh, ((abs(t_mesh(:,:,1))))); view(0,90); title('Mea Layer 1 Mag');   colorbar ; shading interp; 
-    %subplot(2,2,3); surf(x_mesh,y_mesh, angle(t_mesh(:,:,1))); view(0,90); title('Mea Layer 1 Phas');   colorbar ; shading interp;   
-    %subplot(2,2,2); surf(x_mesh,y_mesh, ((abs(field_z2)))); view(0,90); title('Est Layer 2 Mag');   colorbar ; shading interp;  
-    %subplot(2,2,4); surf(x_mesh,y_mesh, angle(field_z2)); view(0,90); title('Est Layer 2 Phas');   colorbar ; shading interp;  
-    
-    %obtain critical angle. 
-    th1 = atand((0.5*7.2-0.5*1.78)/(15.2));
-    k = tand(th1).*(layers(2)-layers(1)); 
-    %modify axis plane 2.
-   % subplot(2,2,2); axis(floor([-1 1 -1 1].*(26-k)))
-   % subplot(2,2,4); axis([-1 1 -1 1].*(26-k))
-    
-    % plot (2D cut \ field z2)
-    %figure;
-    %plot(field_z2(:,27)/max(field_z2(:,27)));
-    
-    
-    %% This is just to see delta: TODO tweaking
-    figure
-    subplot(1,2,1); surf(x_mesh,y_mesh, (abs(t_mesh(:,:,2)))-(abs(t_mesh(:,:,1)))); view(0,90); title('Delta Sim. 1 Mag');   colorbar ; shading interp; 
-    subplot(1,2,2); surf(x_mesh,y_mesh, angle(t_mesh(:,:,2)-t_mesh(:,:,1))); view(0,90); title('Delta 1 Sim. Phas');   colorbar ; shading interp;
 %% PTP algorithm 
     clc; close all force; 
     f = 60e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [3, 5]; % Distance from the aperture in mm of the layers 1,2
+    layers = [40, 50]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
-    cycles = 20; % Number of iterations for the IFT.                  
+    cycles = 10000; % Number of iterations for the IFT.                  
                        
     %Please select the type of visualization
-        V = 0;
+        V = 2;
         % Visualization options (Variable V)
             % 0: Show animation convergence phase and magnitude, error best
             % case scenario. If the input data is simulated it will show
@@ -187,7 +142,7 @@ Sim = 0; % Variable to indicate measured data
             % order to obtain the results faster. 
         
     %Please select the type of initial guess
-        I = 2;
+        I = 0;
         % Initial guess option
             % 0: Not initial guess at Maut -> the algorithm start
             % working with the iterations between layers
@@ -202,147 +157,106 @@ Sim = 0; % Variable to indicate measured data
             % 4: BMI presented by Li Xiang in
             % his master thesis (See article li_xiang_IFT.pdf)
              
-    %Getting the fields to work with (Layer 1 and 2)
-    [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
+
+    PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda);
+
     
-    %Magnitude and phase of the Fields --> (M=magnitude) (P=Phase)
-        %Getting the magnitude of the fields (Input of the algorithm) 
-            M=abs(f_mesh);
-        %Getting the phases of the fields (for testing the algorithm)
-            P=angle(f_mesh);
-          
-    %Initial guess enter to function calculate Propagation Matrix and 
-     [Maut, layer_aut] = initialguess(X, Y, Z, Ex, I, layers,'plot');
-            
-      %Preallocating and starting variables for iterations 
-        
-        error = zeros(2,cycles); % Error in Magnitude on each layer per iteration.
-        
-        errorp = zeros(2,cycles); % Error in Phase in each layer per iteration.
-           % This is just used in the case of simulation for the sake of
-           % demonstrating the convergence to the true phase 
-        
-        % best case variables with respect to magnitude error
-        best_case = zeros([size(Maut),2]);    
-        error_best_case = [inf, inf]; 
-        iter_best_case = [1, 1];
-        
-        % best case variables with respect to phase error "just for the case of simulated data"
-            % This is aimed to show the convergence behavior of the 'real'
-            % phase with the control parameter of the magnitude of the
-            % electric field.           
-        best_case_p = zeros([size(Maut),2]);    
-        error_best_case_p = [inf, inf]; 
-        iter_best_case_p = [1, 1];
-        
-       %[~,~,Maut] = getFieldLayer(X, Y, Z, Ex, layers(1));  Maut = abs(Maut);
-       
-      %AUT to Layer 1  
-          %Propagating initial guess to first layer
-            if I~=0 
-                field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [layer_aut layers(1)], lambda); 
-            else
-                field_layer1 = 0;
-            end
-          %Replace amplitudes estimated by measurements/simulated
-            field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));            
-        
-     if V==0, figure('Name','Simulated and estimated values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
-     if V==1, figure('Name','Estimated phase values using PTP algorithm (Animation)','units','normalized','outerposition',[0 0 1 1]),end
-     
-     i=1;% variable for the iterations
-     flag = 1; % variable for stop criteria
-     threshold = 1e-3;
-     while  flag~=0           
-      %Layer 1 to Layer 2 
-          %Propagating layer 1 to layer 2
-            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp(:,:,2) = field_layer2;
-          %Replace amplitudes estimated by measurements/simulated
-            field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
-        
-      %Layer 2 to Layer 1 
-          %Propagating initial guess to first layer
-            [field_layer1, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda); temp(:,:,1) = field_layer1;
-          %Replace amplitudes estimated by measurements/simulated 
-             field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
-           
-          %Animation of estimated values using PTP algorithm
-             if V==0, plotIterationsIFT(i, x_mesh, y_mesh, f_mesh, temp), end
-          %Animation only for phase convergence
-             if V==1
-                 subplot(1,2,1); cla; surf(x_mesh,y_mesh, wrapToPi(P(:,:,1)-P(52,53,1)));  title(['\angle Layer 1 -- Simulated Values iter:' num2str(i)]);   colorbar ; shading interp;  view(0,90);
-                 subplot(1,2,2); cla; surf(x_mesh,y_mesh, wrapToPi(angle(field_layer1)-angle(field_layer1(52,53))));  title(['\angle Layer 1 -- Estimated Values iter:' num2str(i)]); colorbar ; shading interp;  view(0,90), pause(1e-3);
-             end
-             
-      %Error in magnitud and phase 
-            error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-            error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
-            errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all')/sum(P(:,:,1).^2,'all');
-            errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all')/sum(P(:,:,2).^2,'all');
-      
-      %Best case scenario in magnitude error layer 1       
-            if error_best_case(1) > error(1,i) 
-                best_case(:,:,1) = temp(:,:,1);
-                error_best_case(1) = error(1,i);
-                iter_best_case(1) = i;
-            end
-       %Best case scenario in magnitude error layer 2       
-            if error_best_case(2) > error(2,i) 
-                best_case(:,:,2) = temp(:,:,2);
-                error_best_case(2) = error(2,i);
-                iter_best_case(2) = i;
-            end      
-            
-       %Best case scenario in phase error layer 1       
-            if error_best_case_p(1) > errorp(1,i) 
-                best_case_p(:,:,1) = temp(:,:,1);
-                error_best_case_p(1) = errorp(1,i);
-                iter_best_case_p(1) = i;
-            end
-       %Best case scenario in phase error layer 2       
-            if error_best_case_p(2) > errorp(2,i) 
-                best_case_p(:,:,2) = temp(:,:,2);
-                error_best_case_p(2) = errorp(2,i);
-                iter_best_case_p(2) = i;
-            end    
-            
-      %Stop criteria based on number of iterations or threshold error in magnitude      
-            if error(1,i)<threshold || i>=cycles 
-               flag = 0;
-            end
-            i = i+1;
-     end 
-        % Plot results
-        plotResults(f_mesh,x_mesh, y_mesh, temp, error, errorp, best_case, best_case_p, V, cycles, iter_best_case, iter_best_case_p);
-        
-% Clear variables not interested in to save memory
+%% Compare data
+clc; close all force;
+% Measurement data
+Edata = load('Data/Data_3layers.txt');
+X = Edata(:,1);
+Y = Edata(:,2);
+zref = 119; 
+Z = Edata(:,3) - zref + 41.2; %
+Exm = Edata(:,7);
+
+% Simulated data
+Edata = load('Data/3layerSIM_1mm.txt');
+X1 = Edata(:,1);
+Y1 = Edata(:,2);
+zref = 119; 
+Z1 = Edata(:,3) - zref + 41.2; %
+Exs = Edata(:,4)+ 1i*Edata(:,5);
+
+layers = [3,5];
+[x_mesh, y_mesh, f_mesh1]= getFieldLayer(X, Y, Z, Exm, layers);
+
+[~, ~, f_mesh2]= getFieldLayer(X, Y, Z, abs(Exs), layers);
+
+f_mesh1 = db2mag(f_mesh1);
+deltal1 = f_mesh2(:,:,1) - f_mesh1(:,:,1) ;
+deltal2 = f_mesh2(:,:,2) - f_mesh1(:,:,2);
+% Compare magnitudes in linear (RAW)
+    figure('Name','Linear: Magnitude in layers from Sim. and Mea. Values ','units','normalized','outerposition',[0 0 1 1])
+    subplot(2,2,1); cla; surf(x_mesh,y_mesh, f_mesh2(:,:,1));  title('Simulation: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,3); cla; surf(x_mesh,y_mesh, f_mesh2(:,:,2));  title('Simulation: | L2 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,2); cla; surf(x_mesh,y_mesh, f_mesh1(:,:,1));  title('Measurement: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,4); cla; surf(x_mesh,y_mesh, f_mesh1(:,:,2));  title('Measurement: | L2 |  ');  colorbar ; shading interp;  view(0,0);  
+% Compare magnitudes in dB (RAW)
+    figure('Name','dB: Magnitude in layers from Sim. and Mea. Values ','units','normalized','outerposition',[0 0 1 1])
+    subplot(2,2,1); cla; surf(x_mesh,y_mesh, mag2db(f_mesh2(:,:,1)));  title('Simulation: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,3); cla; surf(x_mesh,y_mesh, mag2db(f_mesh2(:,:,2)));  title('Simulation: | L2 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,2); cla; surf(x_mesh,y_mesh, mag2db(f_mesh1(:,:,1)));  title('Measurement: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,2,4); cla; surf(x_mesh,y_mesh, mag2db(f_mesh1(:,:,2)));  title('Measurement: | L2 |  ');  colorbar ; shading interp;  view(0,0);  
 
 
+f_mesh1(:,:,1) = f_mesh1(:,:,1)./max(max(f_mesh1(:,:,1))); 
+f_mesh1(:,:,2) = f_mesh1(:,:,2)./max(max(f_mesh1(:,:,2))); 
+f_mesh2(:,:,1) = f_mesh2(:,:,1)./max(max(f_mesh2(:,:,1))); 
+f_mesh2(:,:,2) = f_mesh2(:,:,2)./max(max(f_mesh2(:,:,2))); 
+deltal1 = abs(f_mesh2(:,:,1) - f_mesh1(:,:,1)) ;
+deltal2 = abs(f_mesh2(:,:,2) - f_mesh1(:,:,2));
+
+% Compare magnitudes in linear (Normalized)
+    figure('Name','Nor: Magnitude in layers from Sim. and Mea. Values ','units','normalized','outerposition',[0 0 1 1])
+    subplot(2,3,1); cla; surf(x_mesh,y_mesh, f_mesh2(:,:,1));  title('Simulation: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,3,4); cla; surf(x_mesh,y_mesh, f_mesh2(:,:,2));  title('Simulation: | L2 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,3,2); cla; surf(x_mesh,y_mesh, f_mesh1(:,:,1));  title('Measurement: | L1 |  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,3,5); cla; surf(x_mesh,y_mesh, f_mesh1(:,:,2));  title('Measurement: | L2 |  ');  colorbar ; shading interp;  view(0,0);
+    subplot(2,3,3); cla; surf(x_mesh,y_mesh, deltal1);  title('Delta | L1 | Sim - Mes  ');   colorbar ; shading interp;  view(0,0);
+    subplot(2,3,6); cla; surf(x_mesh,y_mesh, deltal2);  title('Delta | L2 |  Sim - Mes');  colorbar ; shading interp;  view(0,0);  
+
+    
+%% Results in phase
+    I = 0; V=2; cycles = 20; lambda = 5e-3;
+    [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Exs, layers, V, I, cycles, lambda);
+    
+    [~, ~, f_mesh1, temp2]=PTP(X, Y, Z, db2mag(Exm), layers, V, I, cycles, lambda);
+    
+    cx = floor(size(x_mesh,1)/2); cy = cx;
+    anglel1s = wrapToPi(angle(temp(:,:,2))-angle(temp(cx,cx+1,2)));
+    anglel1m = wrapToPi(angle(temp2(:,:,2))-angle(temp2(cx,cx+1,2))); 
+    
+    subplot(1,3,1); cla; surf(x_mesh,y_mesh, anglel1s);     colorbar ; shading interp;  view(0,90);
+    subplot(1,3,2); cla; surf(x_mesh,y_mesh, anglel1m);     colorbar ; shading interp;  view(0,90);
+    subplot(1,3,3); cla; surf(x_mesh,y_mesh, wrapToPi(anglel1s - anglel1m));   colorbar ; shading interp;  view(0,90);
+    
 %% Near to Far Field Transform 
-    clc; close all;
-    %First convert to spheric coordinates to polar coordinates
-    
-    ro = sqrt(abs(X).^2+abs(Y).^2+abs(Z).^2) ;
-    theta = (rad2deg(atan(Y./X)));
-    phi = (rad2deg(atan(sqrt(abs(X).^2+abs(Y).^2)./Z)));
-    
-    E_r = sin(theta).*cos(phi).*Ex + sin(theta).*sin(phi).*Ey +cos(theta).*Ez; 
-    E_theta = cos(theta).*cos(phi).*Ex +cos(theta).*sin(phi).*Ex -sin(theta).*Ez;
-    E_phi = -sin(phi).*Ex + cos(phi).*Ey;
-
-
-    Mag = mag2db(sqrt(abs(E_theta).^2 + abs(E_phi).^2));
-    theta(isnan(theta))=0;
-    Input= [(theta),(phi)] ;
-    [iwant, ia, ic] = unique(Input,'rows') ;
-    plotFarField(Mag(ia),iwant(:,1),iwant(:,2));
-    j= 0;
-    %for i=1:length(Mag)
-    %    K(j) = [Mag(i), theta(i), phi(i)];
-    %    j = j+1;
-
-    %end
-    
+%     clc; close all;
+%     %First convert to spheric coordinates to polar coordinates
+%     
+%     ro = sqrt(abs(X).^2+abs(Y).^2+abs(Z).^2) ;
+%     theta = (rad2deg(atan(Y./X)));
+%     phi = (rad2deg(atan(sqrt(abs(X).^2+abs(Y).^2)./Z)));
+%     
+%     E_r = sin(theta).*cos(phi).*Ex + sin(theta).*sin(phi).*Ey +cos(theta).*Ez; 
+%     E_theta = cos(theta).*cos(phi).*Ex +cos(theta).*sin(phi).*Ex -sin(theta).*Ez;
+%     E_phi = -sin(phi).*Ex + cos(phi).*Ey;
+% 
+% 
+%     Mag = mag2db(sqrt(abs(E_theta).^2 + abs(E_phi).^2));
+%     theta(isnan(theta))=0;
+%     Input= [(theta),(phi)] ;
+%     [iwant, ia, ic] = unique(Input,'rows') ;
+%     plotFarField(Mag(ia),iwant(:,1),iwant(:,2));
+%     j= 0;
+%     %for i=1:length(Mag)
+%     %    K(j) = [Mag(i), theta(i), phi(i)];
+%     %    j = j+1;
+% 
+%     %end
+%     
     
 
 
