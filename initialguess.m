@@ -1,8 +1,9 @@
 % This function implement a initial guess for the phase of the field
 % desired. 
-function [Faut, layer_aut] = initialguess(X, Y, Z, Ex, Method, layers,plot)
-    ap_dim =[7.2,10.13]; % Size of the aperture of the aut
-    zref = 41.2; % Relative position of the center of the aperture in z   
+function [Faut, layer_aut] = initialguess(X, Y, Z, Ex, Method, layers,plot,zref)
+    ap_dim =[7.2,10.13]; % Size of the aperture of the aut 60GHz
+    ap_dim =[78.5,78.5]; % 10GHz
+   % zref = 41.2; % Relative position of the center of the aperture in z   
     layer_aut = 0;
     lambda = 0.005; 
     k0 = 2*pi/lambda;
@@ -15,7 +16,7 @@ function [Faut, layer_aut] = initialguess(X, Y, Z, Ex, Method, layers,plot)
         % Method = 2 -> Nearest Layer to AUT in Data (Magnitude)
         % Method = 3 -> Hybrid approach (requires global optimization technique)
         % Method = 4 -> Binary magnitude image
-    [x_mesh, y_mesh, ~]= getFieldLayer(X, Y, Z, Ex, 1);
+    [x_mesh, y_mesh, ~]= getFieldLayer(X, Y, Z, Ex, 3, zref);
 
     if Method == 1
         m1 = -ap_dim(1)/2<=x_mesh & x_mesh<=ap_dim(1)/2;

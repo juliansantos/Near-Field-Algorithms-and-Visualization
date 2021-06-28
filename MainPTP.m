@@ -9,25 +9,26 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/EField_z1mm_xy_1mm.txt'); 
+Edata = load('Data/antBX1mm.txt'); 
+%Edata = load('Data/3layerSIM_1mm.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
     %                           EyRe [V/m], EyIm [V/m], 
     %                           EzRe [V/m], EzIm [V/m].
         
-Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
+%Hdata = load('Data/HField_z1mm_xy_1mm.txt'); 
     % Magnetic Field Columns:   x[mm], y[mm], z[mm],
     %                           HxRe [A/m], HxIm [A/m], 
     %                           HyRe [A/m], HyIm [A/m], 
     %                           HzRe [A/m], HzIm [A/m].
     
-Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
+%Pdata= load('Data/PowerFlow_z1mm_xy_1mm.txt'); 
     % Power Flow Columns: x [mm], y [mm], z [mm], 
     %                     Px [V.A/m^2], 
     %                     Py [V.A/m^2], 
     %                     Pz [V.A/m^2].
 
-FFdata = load('Data/FarField60GHz_Horn.txt'); 
+%FFdata = load('Data/FarField60GHz_Horn.txt'); 
     % Far Field Columns: Theta [deg.], Phi [deg.],
     %                    Abs(Dir.) [dBi], Abs(Theta) [dBi], 
     %                    Phase(Theta) [deg.], Abs(Phi)[ dBi], 
@@ -47,16 +48,26 @@ FFdata = load('Data/FarField60GHz_Horn.txt');
 clc;
 X=Edata(:,1);
 Y=Edata(:,2);
-Z=Edata(:,3);
+Z=Edata(:,3); %Z = round(Z - 0.8865);
+%v = (X == 99 |X == 102 |X == -102 |X == -99);
+%X(v)= [];
+%Y(v)= [];
+%Z(v)=[];
+
+
 Ex = Edata(:,4)+ 1i*Edata(:,5); % Electrical Field: X component
 Ey = Edata(:,6)+ 1i*Edata(:,7); % Electrical Field: Y component
 Ez = Edata(:,8)+ 1i*Edata(:,9); % Electrical Field: Z component
-Hx = Hdata(:,4)+ 1i*Hdata(:,5); % Magnetic Field: X component
-Hy = Hdata(:,6)+ 1i*Hdata(:,7); % Magnetic Field: Y component
-Hz = Hdata(:,8)+ 1i*Hdata(:,9); % Magnetic Field: Z component
-Px = Pdata(:,4); % Power: X component
-Py = Pdata(:,5); % Power: X component
-Pz = Pdata(:,6); % Power: X component
+%Ex(v)= [];
+%Ey(v)= [];
+%Ez(v)=[];
+
+%Hx = Hdata(:,4)+ 1i*Hdata(:,5); % Magnetic Field: X component
+%Hy = Hdata(:,6)+ 1i*Hdata(:,7); % Magnetic Field: Y component
+%Hz = Hdata(:,8)+ 1i*Hdata(:,9); % Magnetic Field: Z component
+%Px = Pdata(:,4); % Power: X component
+%Py = Pdata(:,5); % Power: X component
+%Pz = Pdata(:,6); % Power: X component
 
 NumberEPlanes = length(unique(Edata(:,3))); % Number of E planes = 94
     % The distance between planes is equal to 1mm 
@@ -68,13 +79,14 @@ NumberHPlanes = length(unique(Edata(:,1))); % Number of H planes = 53
     % The last plane is at x=26 (plane yz)
 
 Sim = 1; % Varible to indicate simulated data. 
+size_layers = [200, 200; 200, 200];
 
 %% Loading Experimental data and parameter extraction
 Edata = load('Data/Data_3layers.txt');
 X = Edata(:,1);
 Y = Edata(:,2);
-zref = 119; 
-Z = Edata(:,3) - zref + 41.2; %
+zref = 167.5; 
+Z = Edata(:,3) - zref; %
 Exm = Edata(:,7);
 Exm = db2mag(Exm); 
 Eym = Exm*0; Ezm = Eym; 
@@ -93,11 +105,13 @@ Sim = 0; % Variable to indicate measured data
            % Options: simple, rectangular, slice
            % inside each functions show the functionalities i.e examples of
            % inputs           
-           % Explain the argumets use
+           % Explain the argumets use 
     plotFarField(FFdata(:,3),FFdata(:,1),FFdata(:,2));
     
-%% Visualization of E field.         
-    layers=[3,5];
+%% Visualization of E field.
+    zref = 167.5;
+    layers=[20,60];
+    %Et = sqrt(abs(Ex).^2+abs(Ey).^2+abs(Ez).^2);
     plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers);   
     
 %% Visualization of H field.  
@@ -116,12 +130,14 @@ Sim = 0; % Variable to indicate measured data
     impedanceBehaviour(X,Y,Z,Ex, Ey, Ez, Hx, Hy, Hz,layers)   
     
 %% PTP algorithm 
+% 3 20 50 mm. 
     clc; close all force; 
-    f = 60e9; % Frequency of the signal
+    f = 10e9; % Frequency of the signal
     lambda = 3e8/f; % Wavelength of the signal
-    layers = [40, 50]; % Distance from the aperture in mm of the layers 1,2
+    layers = [20, 40]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
-    cycles = 10000; % Number of iterations for the IFT.                  
+    cycles = 2000; % Number of iterations for the IFT. 
+    zref = 167.5;
                        
     %Please select the type of visualization
         V = 2;
@@ -158,7 +174,7 @@ Sim = 0; % Variable to indicate measured data
             % his master thesis (See article li_xiang_IFT.pdf)
              
 
-    PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda);
+    PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda, zref);
 
     
 %% Compare data
@@ -180,12 +196,13 @@ Z1 = Edata(:,3) - zref + 41.2; %
 Exs = Edata(:,4)+ 1i*Edata(:,5);
 
 layers = [3,5];
-[x_mesh, y_mesh, f_mesh1]= getFieldLayer(X, Y, Z, Exm, layers);
+zref  = 41.2;
+[x_mesh, y_mesh, f_mesh1]= getFieldLayer(X, Y, Z, Exm, layers, zref);
 
-[~, ~, f_mesh2]= getFieldLayer(X, Y, Z, abs(Exs), layers);
+[~, ~, f_mesh2]= getFieldLayer(X, Y, Z, abs(Exs), layers, zref);
 
-f_mesh1 = db2mag(f_mesh1);
-deltal1 = f_mesh2(:,:,1) - f_mesh1(:,:,1) ;
+f_mesh1 = 10.^((f_mesh1)/20);
+deltal1 = f_mesh2(:,:,1) - f_mesh1(:,:,1);
 deltal2 = f_mesh2(:,:,2) - f_mesh1(:,:,2);
 % Compare magnitudes in linear (RAW)
     figure('Name','Linear: Magnitude in layers from Sim. and Mea. Values ','units','normalized','outerposition',[0 0 1 1])

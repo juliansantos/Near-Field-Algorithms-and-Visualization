@@ -1,7 +1,7 @@
-function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda) 
+function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda, zref) 
 
         %Getting the fields to work with (Layer 1 and 2)
-    [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers);
+    [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers, zref);
     
     %Magnitude and phase of the Fields --> (M=magnitude) (P=Phase)
         %Getting the magnitude of the fields (Input of the algorithm) 
@@ -10,7 +10,7 @@ function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, l
             P=angle(f_mesh);
           
     %Initial guess enter to function calculate Propagation Matrix and 
-     [Maut, layer_aut] = initialguess(X, Y, Z, Ex, I, layers,'plot');
+     [Maut, layer_aut] = initialguess(X, Y, Z, Ex, I, layers,'plot', zref);
             
       %Preallocating and starting variables for iterations 
         
@@ -73,11 +73,16 @@ function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, l
              end
              
       %Error in magnitude0 and phase 
-            error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
-            error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
-            errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all')/sum(P(:,:,1).^2,'all');
-            errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all')/sum(P(:,:,2).^2,'all');
+           % error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all')/sum(M(:,:,1).^2,'all');
+           % error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all')/sum(M(:,:,2).^2,'all');
+           % errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all')/sum(P(:,:,1).^2,'all');
+           % errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all')/sum(P(:,:,2).^2,'all');
       
+            error(1,i) = sum((abs(temp(:,:,1)) - M(:,:,1)).^2, 'all');
+            error(2,i) = sum((abs(temp(:,:,2)) - M(:,:,2)).^2, 'all');
+            errorp(1,i) = sum(wrapToPi(angle(temp(:,:,1)) - P(:,:,1)).^2, 'all');
+            errorp(2,i) = sum(wrapToPi(angle(temp(:,:,2)) - P(:,:,2)).^2, 'all');
+            
       %Best case scenario in magnitude error layer 1       
             if error_best_case(1) > error(1,i) 
                 best_case(:,:,1) = temp(:,:,1);

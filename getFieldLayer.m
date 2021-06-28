@@ -2,10 +2,10 @@
 %       This function assumes that all layers have the same number of
 %       discrete elements over XcrossY
 
-function [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, F, layers)
+function [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, F, layers, zref)
     z_values = unique(Z);
     flag = 0; 
-    xref = 0; yref = 0; zref = 41.2 ; % Reference of the aperture of the antenna
+    xref = 0; yref = 0; % zref = 145 ; % Reference of the aperture of the antenna
     layers = layers + zref;
     x_mesh=[]; y_mesh=[]; f_mesh=[];
     for j=1:length(layers)
@@ -22,7 +22,7 @@ function [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, F, layers)
         %ytemp = Y(Z==layers(1));
         %y_mesh = reshape(ytemp, [Luy, length(ytemp)/Luy]);
         y_mesh = x_mesh';
-        dimF = [size(x_mesh,1),size(y_mesh,2)] ;  
+        dimF = [size(x_mesh,1),size(y_mesh,1)] ;  
         
         f_mesh = zeros([dimF,length(layers)]);
         for i=1:length(layers)
