@@ -111,9 +111,9 @@ Sim = 0; % Variable to indicate measured data
     
 %% Visualization of E field.
     zref = 167.5;
-    layers=[0,20];
+    layers=[5,20];
     %Et = sqrt(abs(Ex).^2+abs(Ey).^2+abs(Ez).^2);
-    plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers);   
+    plotElectricField(X, Y, Z, Ey, Ex, Ez, layers, size_layers);   
     
 %% Visualization of H field.  
     layers=[4,27];

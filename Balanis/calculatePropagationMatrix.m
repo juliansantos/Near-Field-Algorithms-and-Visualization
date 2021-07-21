@@ -25,7 +25,7 @@ function [Propagated_field] = calculatePropagationMatrix(field, layers, lambda0,
         if method == 1
             fx = ifftshift(ifft2(field,MI,NI));
             fx_z0 = fx.*exp(-1i*kz_grid*z_0).*(imag(kz_grid)==0);
-            oE_x_Zero_Padded = fft2(ifftshift(fx_z0));
+            E_x_Zero_Padded = fft2(ifftshift(fx_z0));
             Propagated_field = E_x_Zero_Padded(1:M,1:N);
         elseif method == 2
             
