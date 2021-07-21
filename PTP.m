@@ -97,17 +97,17 @@ function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, l
             end      
             
        %Best case scenario in phase error layer 1       
-            if error_best_case_p(1) > errorp(1,i) 
-                best_case_p(:,:,1) = temp(:,:,1);
-                error_best_case_p(1) = errorp(1,i);
-                iter_best_case_p(1) = i;
-            end
+            %if error_best_case_p(1) > errorp(1,i) 
+            %    best_case_p(:,:,1) = temp(:,:,1);
+            %    error_best_case_p(1) = errorp(1,i);
+            %    iter_best_case_p(1) = i;
+            %end
        %Best case scenario in phase error layer 2       
-            if error_best_case_p(2) > errorp(2,i) 
-                best_case_p(:,:,2) = temp(:,:,2);
-                error_best_case_p(2) = errorp(2,i);
-                iter_best_case_p(2) = i;
-            end    
+            %if error_best_case_p(2) > errorp(2,i) 
+            %    best_case_p(:,:,2) = temp(:,:,2);
+            %    error_best_case_p(2) = errorp(2,i);
+            %    iter_best_case_p(2) = i;
+            %end    
             
       %Stop criteria based on number of iterations or threshold error in magnitude      
             if error(1,i)<threshold || i>=cycles 
