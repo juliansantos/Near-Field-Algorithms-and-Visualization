@@ -9,8 +9,8 @@
 clear all; clc; close all force; 
  
 % Loading data from CST 
-Edata = load('Data/antBX1mm.txt'); 
-%Edata = load('Data/EField_z1mm_xy_0.5mm.txt'); 
+%Edata = load('Data/antBX1mm.txt'); 
+Edata = load('Data/EField_z1mm_xy_0.5mm.txt'); 
 %Edata = load('Data/3layerSIM_1mm.txt'); 
     % Elecrical Field Columns:  x [mm], y [mm], z [mm],
     %                           ExRe [V/m], ExIm [V/m], 
@@ -111,9 +111,9 @@ Sim = 0; % Variable to indicate measured data
     
 %% Visualization of E field.
     zref = 167.5;
-    layers=[0,20];
+    layers=[5,20];
     %Et = sqrt(abs(Ex).^2+abs(Ey).^2+abs(Ez).^2);
-    plotElectricField(X, Y, Z, Ex, Ey, Ez, layers, size_layers);   
+    plotElectricField(X, Y, Z, Ey, Ex, Ez, layers, size_layers);   
     
 %% Visualization of H field.  
     layers=[4,27];
@@ -132,16 +132,20 @@ Sim = 0; % Variable to indicate measured data
     
 %% PTP algorithm 
     clc; close all force; 
-    f = 10e9; % Frequency of the signal
+    f = 60e9; % Frequency of the signal
     lambda = 299792458/f; % Wavelength of the signal
-    layers = [20, 50]; % Distance from the aperture in mm of the layers 1,2
+    layers = [5, 20]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
-    cycles = 50; % Number of iterations for the IFT. 
-    zref = 167.5; % Reference in z position of the aperture
-    dx = 0.001; % planar x scan step size [m]
-    dy = 0.001; % planar y scan step size [m]
+    cycles = 20; % Number of iterations for the IFT. 
+    %zref = 167.5; % Reference in z position of the aperture 10 GHz
+    zref = 41.2; % Reference in z position of the aperture 10 GHz
     
-     %zref = 41.2;                  
+   % dx = 0.001; % planar x scan step size [m]
+   % dy = 0.001; % planar y scan step size [m]
+    
+   % dx = 0.0005; % planar x scan step size [m]
+   % dy = 0.0005; % planar y scan step size [m]
+                       
     %Please select the type of visualization
         V = 0;
         % Visualization options (Variable V)
@@ -161,7 +165,7 @@ Sim = 0; % Variable to indicate measured data
             % order to obtain the results faster. 
         
     %Please select the type of initial guess
-        I = 0;
+        I = 1;
         % Initial guess option
             % 0: Not initial guess at Maut -> the algorithm start
             % working with the iterations between layers

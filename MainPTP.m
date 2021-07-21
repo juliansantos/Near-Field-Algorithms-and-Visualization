@@ -86,7 +86,7 @@ size_layers = [200, 200; 200, 200];
 Edata = load('Data/Data_3layers.txt');
 X = Edata(:,1);
 Y = Edata(:,2);
-zref = 167.5; 
+zref = 41.2; 
 Z = Edata(:,3) - zref; %
 Exm = Edata(:,7);
 Exm = db2mag(Exm); 
@@ -137,11 +137,15 @@ Sim = 0; % Variable to indicate measured data
     layers = [5, 20]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
     cycles = 20; % Number of iterations for the IFT. 
-    zref = 167.5; % Reference in z position of the aperture
+    zref = 167.5; % Reference in z position of the aperture 10 GHz
+    %zref = 41.2; % Reference in z position of the aperture 60 GHz
+    
     dx = 0.001; % planar x scan step size [m]
     dy = 0.001; % planar y scan step size [m]
     
-     %zref = 41.2;                  
+   % dx = 0.0005; % planar x scan step size [m]
+   % dy = 0.0005; % planar y scan step size [m]
+                       
     %Please select the type of visualization
         V = 0;
         % Visualization options (Variable V)
@@ -161,7 +165,7 @@ Sim = 0; % Variable to indicate measured data
             % order to obtain the results faster. 
         
     %Please select the type of initial guess
-        I = 0;
+        I = 1;
         % Initial guess option
             % 0: Not initial guess at Maut -> the algorithm start
             % working with the iterations between layers

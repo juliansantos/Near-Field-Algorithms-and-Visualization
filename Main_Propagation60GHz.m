@@ -1,7 +1,7 @@
 %Propagation at 10GHz -- Horn Antenna
-
+clear all
 % Simulated Data
-Edata = load('Data/antBX1mm.txt'); % Data of layers from 0mm to 158mm in z
+Edata = load('Data/EField_z1mm_xy_0.5mm.txt'); % Data of layers from 0mm to 158mm in z
 
 clc;
 X=Edata(:,1);
@@ -14,17 +14,17 @@ Ez = Edata(:,8)+ 1i*Edata(:,9); % Electrical Field: Z component
 
 %%
 
-f = 10e9; % Frequency of the signal
+f = 60e9; % Frequency of the signal
 lambda = 299792458/f; % Wavelength of the signal
-layers = [10, 100]; % Distance from the aperture in mm of the layers 1,2
-zref = 167.5;
+layers = [0, 50]; % Distance from the aperture in mm of the layers 1,2
+zref = 41.2;
 [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers, zref);
 
 Field = f_mesh(:,:,1);
 Desired_Field = f_mesh(:,:,2);
 
-dx = 0.001; % planar x scan step size [m]
-dy = 0.001; % planar y scan step size [m]
+dx = 0.0005; % planar x scan step size [m]
+dy = 0.0005; % planar y scan step size [m]
 
 E_x = calculatePropagationMatrix(Field, layers, lambda, dx, dy);
 
