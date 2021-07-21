@@ -4,53 +4,30 @@
 % Please see the articles [1]-[14] to see a mathematical demonstration fo the 
 % following code. 
 
-function [ifft_fact, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field, layers, lambda)
+function [Propagated_field] = calculatePropagationMatrix(field, layers, lambda0,dx,dy)
     
-    xref = 0; yref = 0; zref = 167.5 ;
-    ko = 2 * pi/lambda;
-    %kx = ko *x_mesh*1e-3;
-    %ky = ko *y_mesh*1e-3;
+    k0 = 2*pi/lambda0; 
+    [M,N] = size(field);
+    MI = 10*M;
+    NI = 10*N;
+    m = (-MI/2):1:(MI/2-1);
+    n = (-NI/2):1:(NI/2-1);
 
-    [azimuth1,elevation1,~] = cart2sph(x_mesh,y_mesh,layers(2)*ones(size(x_mesh)));
-    kx = ko *sin(elevation1).*cos(azimuth1);
-    ky = ko *sin(elevation1).*sin(azimuth1);  
-    d = (layers(2)-layers(1))*1e-3;
-    factor = exp(-1i.*sqrt(ko.^2 -kx.^2-ky.^2)*d);
-   
-    [azimuth2,elevation2,~] = cart2sph(x_mesh,y_mesh,layers(1)*ones(size(x_mesh)));
-    kx1 = ko *sin(elevation2).*cos(azimuth1);
-    ky1 = ko *sin(elevation2).*sin(azimuth1);  
-    factor2 = exp(-1i.*sqrt(ko.^2 -kx1.^2-ky1.^2)*d);
-    
+    kx = 2*pi*m/(MI*dx);   % Define kx axis for plane wave spectrum
+    ky = 2*pi*n/(NI*dy);   % Define ky axis for plane wave spectrum
+    [ky_grid, kx_grid] = meshgrid(ky,kx);
+    kz_grid = sqrt(k0^2 - kx_grid.^2 - ky_grid.^2); % Define kz axis for plane wave spectrum
+    z_0= (layers(2)-layers(1))*1e-3;
     method = 1;
+    
     
     %Method 1 ifft - fft:
         if method == 1
-            fft_field = ((fft2(field)));
-            if d>0
-                ifft_fact = (ifft2((fft_field.*factor)));
-            else 
-                ifft_fact = (ifft2((fft_field.*factor2)));
-            end
-            %figure;
-            %surf(abs(fft_field));
-            %figure;
-    %Method 2 idft - dft: 
+            fx = ifftshift(ifft2(field,MI,NI));
+            fx_z0 = fx.*exp(-1i*kz_grid*z_0).*(imag(kz_grid)==0);
+            E_x_Zero_Padded = fft2(ifftshift(fx_z0));
+            Propagated_field = E_x_Zero_Padded(1:M,1:N);
         elseif method == 2
-            pws = zeros(size(kx));
-            % Here implement the DFT of the function 
-            for i=1:size(kx,2)
-                for j=1:size(ky,1)
-                    pws(i,j) = sum(field(i,j)* exp(1i *(kx(i,j)*x_mesh*1e-3 + ky(i,j)*y_mesh*1e-3)),'all');
-                end
-            end
-            % Here implement the IDFT of the function 
-            interfact = pws.* factor; 
-            ifft_fact = zeros(size(interfact));
-            for i=1:size(x_mesh,2)
-                for j=1:size(y_mesh,1)
-                    ifft_fact(i,j) = sum(interfact(i,j)* exp(-1i *(kx*x_mesh(i,j)*1e-3 + ky*y_mesh(i,j)*1e-3)),'all');
-                end
-            end
+            
         end
 end 

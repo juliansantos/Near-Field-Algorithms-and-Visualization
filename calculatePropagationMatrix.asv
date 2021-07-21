@@ -1,0 +1,28 @@
+% here enter the reduced matrix from zero towards chess
+
+
+% Please see the articles [1]-[14] to see a mathematical demonstration fo the 
+% following code. 
+
+function [ifft_fact, factor] = calculatePropagationMatrix(x_mesh, y_mesh, field, layers, lambda0)
+    
+    xref = 0; yref = 0; zref = 167.5 ; 
+    k0 = 2*pi/lambda0; 
+    [M,N] = size(E_meas_x)
+
+    
+    method = 1;
+    
+    %Method 1 ifft - fft:
+        if method == 1
+            fft_field = ((fft2(field)));
+            if d>0
+                ifft_fact = (ifft2((fft_field.*factor)));
+            else 
+                ifft_fact = (ifft2((fft_field.*factor2)));
+            end
+
+        elseif method == 2
+            
+        end
+end 

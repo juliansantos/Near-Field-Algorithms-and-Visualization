@@ -134,9 +134,9 @@ Sim = 0; % Variable to indicate measured data
     clc; close all force; 
     f = 10e9; % Frequency of the signal
     lambda = 299792458/f; % Wavelength of the signal
-    layers = [5, 20]; % Distance from the aperture in mm of the layers 1,2
+    layers = [20, 50]; % Distance from the aperture in mm of the layers 1,2
                        % for the PTP algorithm 
-    cycles = 20; % Number of iterations for the IFT. 
+    cycles = 50; % Number of iterations for the IFT. 
     zref = 167.5; % Reference in z position of the aperture
     dx = 0.001; % planar x scan step size [m]
     dy = 0.001; % planar y scan step size [m]

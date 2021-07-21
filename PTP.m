@@ -1,4 +1,4 @@
-function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda, zref) 
+function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, lambda, zref, dx, dy) 
 
         %Getting the fields to work with (Layer 1 and 2)
     [x_mesh, y_mesh, f_mesh]= getFieldLayer(X, Y, Z, Ex, layers, zref);
@@ -38,7 +38,7 @@ function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, l
       %AUT to Layer 1  
           %Propagating initial guess to first layer
             if I~=0 
-                field_layer1 = calculatePropagationMatrix(x_mesh, y_mesh, Maut, [layer_aut layers(1)], lambda); 
+                field_layer1 = calculatePropagationMatrix(Maut, [layer_aut layers(1)], lambda,dx,dy); 
             else
                 field_layer1 = 0;
             end
@@ -54,13 +54,13 @@ function [x_mesh, y_mesh, f_mesh, temp]=PTP(X, Y, Z, Ex, layers, V, I, cycles, l
      while  flag~=0           
       %Layer 1 to Layer 2 
           %Propagating layer 1 to layer 2
-            field_layer2 = calculatePropagationMatrix(x_mesh, y_mesh, field_layer1, layers, lambda); temp(:,:,2) = field_layer2;
+            field_layer2 = calculatePropagationMatrix(field_layer1, layers, lambda,dx,dy); temp(:,:,2) = field_layer2;
           %Replace amplitudes estimated by measurements/simulated
             field_layer2 = M(:,:,2).*exp(1i*angle(field_layer2));
         
       %Layer 2 to Layer 1 
           %Propagating initial guess to first layer
-            [field_layer1, ~] = calculatePropagationMatrix(x_mesh, y_mesh, field_layer2, flip(layers), lambda); temp(:,:,1) = field_layer1;
+             field_layer1 = calculatePropagationMatrix(field_layer2, flip(layers), lambda,dx,dy); temp(:,:,1) = field_layer1;
           %Replace amplitudes estimated by measurements/simulated 
              field_layer1 = M(:,:,1).*exp(1i*angle(field_layer1));
            
